@@ -1,7 +1,11 @@
+{-# language BangPatterns #-}
 module Data.Group.Internal
 ( -- * Groups
   Group(..)
 , (-)
+, (^)
+, conjugate
+, order
   -- * Abelian groups
 , AbelianGroup
 , commuting
@@ -10,12 +14,13 @@ module Data.Group.Internal
 
 import Data.Bool
 import Data.Monoid
+import Data.Semigroup
 
-import Prelude hiding ((-), negate)
+import Prelude hiding ((-), (^), negate)
 import qualified Prelude
 
-
 infixl 6 -
+infixr 8 ^
 
 -- -------------------------------------------------------------------- --
 -- Groups
@@ -29,9 +34,6 @@ class Monoid a => Group a where
   minus a b = a <> invert b
   {-# inline minus #-}
   {-# minimal invert | minus #-}
-
-(-) :: Group a => a -> a -> a
-(-) = minus
 
 instance Group () where
   invert = id
@@ -76,6 +78,29 @@ instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) wher
   invert ~(a,b,c,d,e) = (invert a, invert b, invert c, invert d, invert e)
   {-# inline invert #-}
 
+
+(-) :: Group a => a -> a -> a
+(-) = minus
+{-# inline (-) #-}
+
+(^) :: (Integral n, Group a) => a -> n -> a
+a ^ n = stimes n a
+{-# inline (^) #-}
+
+-- | Conjugate an element of a group by another element.
+--
+conjugate :: Group a => a -> a -> a
+conjugate a b = b <> (a - b)
+{-# inline conjugate #-}
+
+-- | Calculate the order of a particular element in a group.
+--
+order :: (Eq a, Group a) => a -> Integer
+order = go 0 where
+  go !n g
+    | g == mempty = n
+    | otherwise = go (succ n) (g <> g)
+
 -- -------------------------------------------------------------------- --
 -- Abelian (commutative) groups
 
@@ -92,7 +117,8 @@ instance (AbelianGroup a, AbelianGroup b, AbelianGroup c) => AbelianGroup (a,b,c
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d) => AbelianGroup (a,b,c,d)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d, AbelianGroup e) => AbelianGroup (a,b,c,d,e)
 
--- | Apply @('<>')@ commuting arguments.
+
+-- | Apply @('<>')@, commuting its arguments.
 --
 commuting :: AbelianGroup a => a -> a -> a
 commuting a b = b <> a
