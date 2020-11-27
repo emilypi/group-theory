@@ -2,7 +2,6 @@ module Data.Group.Internal
 ( -- * Groups
   Group(..)
 , (-)
-, WrappedGroup(..)
   -- * Abelian groups
 , AbelianGroup
 , commuting
@@ -11,7 +10,6 @@ module Data.Group.Internal
 
 import Data.Bool
 import Data.Monoid
-import Data.Semigroup
 
 import Prelude hiding ((-), negate)
 import qualified Prelude
@@ -78,17 +76,6 @@ instance (Group a, Group b, Group c, Group d) => Group (a,b,c,d) where
 instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) where
   invert ~(a,b,c,d,e) = (invert a, invert b, invert c, invert d, invert e)
   {-# inline invert #-}
-
--- -------------------------------------------------------------------- --
--- Wrapped groups
-
-newtype WrappedGroup a = WrappedGroup a
-
-instance Group a => Semigroup (WrappedGroup a) where
-  WrappedGroup a <> WrappedGroup b = WrappedGroup (a <> b)
-
-instance Group a => Monoid (WrappedGroup a) where
-  mempty = WrappedGroup mempty
 
 -- -------------------------------------------------------------------- --
 -- Abelian (commutative) groups
