@@ -79,10 +79,14 @@ instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) wher
   {-# inline invert #-}
 
 
+-- | Infix alias for 'minus'.
+--
 (-) :: Group a => a -> a -> a
 (-) = minus
 {-# inline (-) #-}
 
+-- | Infix alias for 'stimes'.
+--
 (^) :: (Integral n, Group a) => a -> n -> a
 a ^ n = stimes n a
 {-# inline (^) #-}
