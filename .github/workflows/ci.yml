@@ -1,7 +1,8 @@
 
 name: ci
 on:
-  pull_request: {}
+  pull_request:
+
   push:
     branches:
       - master
@@ -12,9 +13,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        ghc: ['8.2.2','8.4.4','8.6.5', '8.8.3','8.10.2','latest']
-        cabal: ['3.2.0.0', 'latest']
-        os: [ubuntu-latest, macOS-latest]
+        ghc: ['8.4.4','8.6.5', '8.8.4','8.10.2','latest']
+        cabal: ['latest']
+        os: [ubuntu-latest]
 
     name: ci-${{ matrix.ghc }}
 
