@@ -1,35 +1,41 @@
-cabal-version:       2.0
+cabal-version:   2.0
+name:            group-theory
+version:         0.1.0.0
+synopsis:        The theory of groups
+description:
+  This package includes definitions for Groups (monoids with invertibility), including
+  finite, simple, cyclic, and permutation groups.
 
-name:                group-theory
-version:             0.1.0.0
-synopsis:            The theory of groups
-description:         This package includes definitions for Groups (monoids with invertibility), including
-                     discrete, finite, simple, cyclic, and permutation groups.
-
-homepage:            https://github.com/emilypi/group-theory
-bug-reports:         https://github.com/emilypi/group-theory/issues
-license:             BSD3
-license-file:        LICENSE
-author:              Emily Pillmore
-maintainer:          emilypi@cohomolo.gy
-copyright:           (c) 2020 Emily Pillmore <emilypi@cohomolo.gy>
-category:            Algebra
-build-type:          Simple
+homepage:        https://github.com/emilypi/group-theory
+bug-reports:     https://github.com/emilypi/group-theory/issues
+license:         BSD3
+license-file:    LICENSE
+author:          Emily Pillmore
+maintainer:      emilypi@cohomolo.gy
+copyright:       (c) 2020 Emily Pillmore <emilypi@cohomolo.gy>
+category:        Algebra, Math, Permutations, Groups
+build-type:      Simple
 extra-doc-files:
   CHANGELOG.md
   README.md
 
 library
-  exposed-modules:     MyLib
-  -- other-modules:
-  -- other-extensions:
-  build-depends:       base >=4.10 && <5
-  hs-source-dirs:      src
-  default-language:    Haskell2010
+  exposed-modules:
+    Data.Group
+    Data.Group.Additive
+    Data.Group.Additive.Class
+    Data.Group.Cyclic
+    Data.Group.Cyclic.Class
+    Data.Group.Finite
+    Data.Group.Finite.Class
+    Data.Group.Multiplicative
+    Data.Group.Multiplicative.Class
+    Data.Group.Permutation
+    Data.Group.Permutation.Class
+    Data.Group.Simple
+    Data.Group.Simple.Class
 
-test-suite tests
-  default-language:    Haskell2010
-  type:                exitcode-stdio-1.0
-  hs-source-dirs:      test
-  main-is:             MyLibTest.hs
-  build-depends:       base ^>=4.12.0.0
+  build-depends:    base >=4.10 && <5
+  hs-source-dirs:   src
+  default-language: Haskell2010
+  ghc-options:      -Wall
