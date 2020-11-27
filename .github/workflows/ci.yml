@@ -16,7 +16,7 @@ jobs:
         cabal: ['3.2.0.0', 'latest']
         os: [ubuntu-latest, macOS-latest]
 
-    name: CI-${{ matrix.ghc }}
+    name: ci-${{ matrix.ghc }}
 
     env:
       CONFIG: "-O0 --enable-tests"
@@ -29,12 +29,10 @@ jobs:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
 
-      - run: |
-        cabal update
-        cabal clean
-        cabal configure $CONFIG
-        cabal freeze $CONFIG
-
+      - run: cabal update
+      - run: cabal clean
+      - run: cabal configure $CONFIG
+      - run: cabal freeze $CONFIG
       - uses: actions/cache@v2
         with:
           path: |
@@ -44,7 +42,6 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.ghc }}
-      - run: |
-        cabal build
-        cabal test
-        cabal check
+      - run: cabal build
+      - run: cabal test
+      - run: cabal check
