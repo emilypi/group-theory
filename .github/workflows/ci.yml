@@ -1,0 +1,50 @@
+
+name: ci
+on:
+  pull_request: {}
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        ghc: ['8.2.2','8.4.4','8.6.5', '8.8.3','8.10.2','latest']
+        cabal: ['3.2.0.0', 'latest']
+        os: [ubuntu-latest, macOS-latest]
+
+    name: CI-${{ matrix.ghc }}
+
+    env:
+      CONFIG: "-O0 --enable-tests"
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup
+        uses: actions/setup-haskell@v1
+        with:
+          ghc-version: ${{ matrix.ghc }}
+          cabal-version: ${{ matrix.cabal }}
+
+      - run: |
+        cabal update
+        cabal clean
+        cabal configure $CONFIG
+        cabal freeze $CONFIG
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/cabal.store
+            dist-newstyle
+
+          key: ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.ghc }}
+      - run: |
+        cabal build
+        cabal test
+        cabal check
