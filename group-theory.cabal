@@ -35,6 +35,8 @@ library
     Data.Group.Simple
     Data.Group.Simple.Class
 
+  other-modules:    Data.Group.Internal
+
   build-depends:    base >=4.10 && <5
   hs-source-dirs:   src
   default-language: Haskell2010
