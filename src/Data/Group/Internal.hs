@@ -19,8 +19,19 @@ import Data.Semigroup
 import Prelude hiding ((-), (^), negate)
 import qualified Prelude
 
+
 infixl 6 -
 infixr 8 ^
+
+
+-- $setup
+--
+-- >>> import qualified Prelude
+-- >>> import Data.Group
+-- >>> import Data.Monoid
+-- >>> import Data.Semigroup
+-- >>> :set -XTypeApplications
+
 
 -- -------------------------------------------------------------------- --
 -- Groups
@@ -78,8 +89,24 @@ instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) wher
   invert ~(a,b,c,d,e) = (invert a, invert b, invert c, invert d, invert e)
   {-# inline invert #-}
 
+-- -------------------------------------------------------------------- --
+-- Group combinators
 
 -- | Infix alias for 'minus'.
+--
+-- === __Examples__:
+--
+-- >>> let x = Sum (3 :: Int)
+-- >>> x - x
+-- Sum {getSum = 0}
+--
+-- >>> let x = Any True
+-- >>> x - x
+-- Any {getAny = True}
+--
+-- >>> let x = All True
+-- >>> x - x
+-- All {getAll = False}
 --
 (-) :: Group a => a -> a -> a
 (-) = minus
@@ -87,23 +114,58 @@ instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) wher
 
 -- | Infix alias for 'stimes'.
 --
+-- === __Examples__:
+--
+-- >>> let x = Sum (3 :: Int)
+-- >>> x ^ 3
+-- Sum {getSum = 9}
+--
+-- >>> let x = Product (3 :: Rational)
+-- >>> x ^ 3
+-- Product {getProduct = 27 % 1}
+--
 (^) :: (Integral n, Group a) => a -> n -> a
 a ^ n = stimes n a
 {-# inline (^) #-}
 
 -- | Conjugate an element of a group by another element.
 --
+-- === __Examples__:
+--
+-- >>> let x = Sum (3 :: Int)
+-- >>> conjugate x x
+-- Sum {getSum = 3}
+--
+-- >>> let x = All True
+-- >>> conjugate x (All False)
+-- All {getAll = False}
+--
 conjugate :: Group a => a -> a -> a
-conjugate a b = b <> (a - b)
+conjugate a b = (b <> a) - b
 {-# inline conjugate #-}
 
 -- | Calculate the order of a particular element in a group.
+--
+-- /Warning:/ may be infinite and explode on you.
+--
+-- === __Examples__:
+--
+-- >>> order @(Sum Int) 3
+-- 64
+--
+-- >>> order (Any False)
+-- 0
 --
 order :: (Eq a, Group a) => a -> Integer
 order = go 0 where
   go !n g
     | g == mempty = n
     | otherwise = go (succ n) (g <> g)
+
+-- | Apply @('<>')@, commuting its arguments.
+--
+commuting :: Group a => a -> a -> a
+commuting a b = b <> a
 
 -- -------------------------------------------------------------------- --
 -- Abelian (commutative) groups
@@ -120,9 +182,3 @@ instance (AbelianGroup a, AbelianGroup b) => AbelianGroup (a,b)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c) => AbelianGroup (a,b,c)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d) => AbelianGroup (a,b,c,d)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d, AbelianGroup e) => AbelianGroup (a,b,c,d,e)
-
-
--- | Apply @('<>')@, commuting its arguments.
---
-commuting :: AbelianGroup a => a -> a -> a
-commuting a b = b <> a
