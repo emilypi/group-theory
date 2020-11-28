@@ -14,11 +14,14 @@
 module Data.Group.Cyclic
 ( -- * Cyclic groups
   CyclicGroup(..)
+  -- ** Combinators
+, generate
 ) where
 
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
+import Data.List
 import Data.Monoid
 import Data.Proxy
 
@@ -86,3 +89,17 @@ instance (CyclicGroup a, CyclicGroup b, CyclicGroup c, CyclicGroup d) => CyclicG
 instance (CyclicGroup a, CyclicGroup b, CyclicGroup c, CyclicGroup d, CyclicGroup e) => CyclicGroup (a,b,c,d,e) where
   generator = (generator, generator, generator, generator, generator)
   {-# inlinable generator #-}
+
+-- -------------------------------------------------------------------- --
+-- Cyclic group combinators
+
+-- | Lazily generate all elements of a 'CyclicGroup' from its generator.
+--
+-- /Note/: the use of 'unfoldr' allows this to fuse.
+--
+generate :: (Eq a, CyclicGroup a) => [a]
+generate = unfoldr go (generator, 0 :: Integer)
+  where
+    go (a, !n)
+      | a == mempty, n > 0 = Nothing
+      | otherwise = Just (a, (a <> generator, succ n))
