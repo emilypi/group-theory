@@ -4,11 +4,11 @@ module Data.Group.Internal
   Group(..)
 , (-)
 , (^)
+, (><)
 , conjugate
 , order
   -- * Abelian groups
 , AbelianGroup
-, commuting
 ) where
 
 
@@ -21,6 +21,7 @@ import qualified Prelude
 
 
 infixl 6 -
+infixr 6 ><
 infixr 8 ^
 
 
@@ -128,6 +129,11 @@ instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) wher
 a ^ n = stimes n a
 {-# inline (^) #-}
 
+-- | Apply @('<>')@, commuting its arguments.
+--
+(><) :: Group a => a -> a -> a
+a >< b = b <> a
+
 -- | Conjugate an element of a group by another element.
 --
 -- === __Examples__:
@@ -161,11 +167,6 @@ order = go 0 where
   go !n g
     | g == mempty = n
     | otherwise = go (succ n) (g <> g)
-
--- | Apply @('<>')@, commuting its arguments.
---
-commuting :: Group a => a -> a -> a
-commuting a b = b <> a
 
 -- -------------------------------------------------------------------- --
 -- Abelian (commutative) groups
