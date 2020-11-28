@@ -13,7 +13,7 @@
 --
 module Data.Group.Additive
 ( -- * Additive groups
-  AdditiveGroup
+  AdditiveGroup(..)
   -- ** Combinators
 , (-)
 , (×)
@@ -45,10 +45,28 @@ infixl 7 ×
 -- -------------------------------------------------------------------- --
 -- Additive groups
 
+-- | An additive group is a 'Group' whose operation can be thought of
+-- as addition in some sense.
+--
+-- For example, the additive group of \( (ℤ, 0, +) \).
+--
 class AbelianGroup g => AdditiveGroup g where
+  -- | Add an element of an additive group to itself @n@-many times.
+  --
+  -- This represents @ℕ@-indexed copowers of an element @g@ of
+  -- an additive group, i.e. iterated coproducts of group elements.
+  -- This is representable by the universal property
+  -- \( C(∐_ₙ g, x) ≅ C(g, x)ⁿ \).
+  --
+  -- === __Examples__:
+  --
+  -- >>> copower 2 (Sum 3)
+  -- Sum {getSum = 6}
+  --
   copower :: Integral n => n -> g -> g
   copower = stimes
   {-# inline copower #-}
+
 
 instance AdditiveGroup ()
 instance AdditiveGroup b => AdditiveGroup (a -> b)
@@ -95,6 +113,10 @@ instance AdditiveGroup Ordering
 -- -------------------------------------------------------------------- --
 -- Additive abelian groups
 
+-- | An additive abelian group is an 'AbelianGroup' whose operation can be thought of
+-- as addition in some sense, whose operation is commutative. Almost all
+-- additive groups are also abelian groups.
+--
 class (AbelianGroup g, AdditiveGroup g) => AdditiveAbelianGroup g
 instance AdditiveAbelianGroup ()
 instance AdditiveAbelianGroup b => AdditiveAbelianGroup (a -> b)
