@@ -49,7 +49,7 @@ infixr 8 ^
 -- | An multiplicative group is a 'Group' whose operation can be thought of
 -- as multiplication in some sense.
 --
--- For example, the multiplicative group of rationals \( (ℚ, 0, +) \).
+-- For example, the multiplicative group of rationals \( (ℚ, 1, *) \).
 --
 class AbelianGroup g => MultiplicativeGroup g
 
