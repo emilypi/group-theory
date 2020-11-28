@@ -12,8 +12,13 @@ module Data.Group
 ) where
 
 
+
 import Data.Bool
+import Data.Functor.Const
+import Data.Functor.Identity
 import Data.Monoid
+import Data.Ord
+import Data.Proxy
 
 import Prelude hiding (negate)
 import qualified Prelude
@@ -64,13 +69,30 @@ instance Num a => Group (Sum a) where
   invert = Prelude.negate
   {-# inline invert #-}
 
+instance Group a => Group (Const a b) where
+  invert = Const . invert . getConst
+  {-# inline invert #-}
+
+instance Group a => Group (Identity a) where
+  invert = Identity . invert . runIdentity
+  {-# inline invert #-}
+
 instance Prelude.Fractional a => Group (Product a) where
   invert = Product . Prelude.recip . getProduct
+  {-# inline invert #-}
+
+instance Group Ordering where
+  invert LT = GT
+  invert EQ = EQ
+  invert GT = LT
   {-# inline invert #-}
 
 instance (Group a, Group b) => Group (a,b) where
   invert ~(a,b) = (invert a, invert b)
   {-# inline invert #-}
+
+instance Group a => Group (Proxy a) where
+  invert _ = Proxy
 
 instance (Group a, Group b, Group c) => Group (a,b,c) where
   invert ~(a,b,c) = (invert a, invert b, invert c)
