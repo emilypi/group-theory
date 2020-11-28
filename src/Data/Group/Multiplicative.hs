@@ -16,7 +16,9 @@ module Data.Group.Multiplicative
   MultiplicativeGroup
   -- ** combinators
 , (/)
+, (*)
 , (^)
+, power
   -- * Multiplicative abelian groups
 , MultiplicativeAbelianGroup
 ) where
@@ -28,9 +30,9 @@ import Data.Group
 import Data.Proxy
 import Data.Semigroup
 
-import Prelude hiding ((^), (/))
+import Prelude hiding ((^), (/), (*))
 
-infixl 7 /
+infixl 7 /, *
 infixr 8 ^
 
 -- $setup
@@ -44,10 +46,12 @@ infixr 8 ^
 -- -------------------------------------------------------------------- --
 -- Multiplicative groups
 
-class AbelianGroup g => MultiplicativeGroup g where
-  power :: Integral n => g -> n -> g
-  power a n = stimes n a
-  {-# inline power #-}
+-- | An multiplicative group is a 'Group' whose operation can be thought of
+-- as multiplication in some sense.
+--
+-- For example, the multiplicative group of rationals \( (ℚ, 0, +) \).
+--
+class AbelianGroup g => MultiplicativeGroup g
 
 instance MultiplicativeGroup ()
 instance MultiplicativeGroup b => MultiplicativeGroup (a -> b)
@@ -74,6 +78,17 @@ instance MultiplicativeGroup a => MultiplicativeGroup (Proxy a)
 (/) = minus
 {-# inline (/) #-}
 
+-- | Infix alias for multiplicative @('<>')@.
+--
+-- === __Examples__:
+--
+-- >>> Product (2 :: Rational) * Product (3 :: Rational)
+-- Product {getProduct = 6}
+--
+(*) :: MultiplicativeGroup g => g -> g -> g
+(*) = (<>)
+{-# inline (*) #-}
+
 -- | Infix alias for 'power'.
 --
 -- === __Examples__:
@@ -86,9 +101,29 @@ instance MultiplicativeGroup a => MultiplicativeGroup (Proxy a)
 (^) = power
 {-# inline (^) #-}
 
+-- | Multiply an element of a multiplicative group by itself @n@-many times.
+--
+-- This represents @ℕ@-indexed powers of an element @g@ of
+-- a multiplicative group, i.e. iterated products of group elements.
+-- This is representable by the universal property
+-- \( C(x, ∏_ₙ g) ≅ C(x, g)ⁿ \).
+--
+-- === __Examples__:
+--
+-- >>> power 3 $ Product (3 :: Rational)
+-- Product {getProuct = 27 % 1}
+--
+power :: (Integral n, MultiplicativeGroup g) => g -> n -> g
+power a n = stimes n a
+{-# inline power #-}
+
 -- -------------------------------------------------------------------- --
 -- Multiplicative abelian groups
 
+-- | A multiplicative abelian group is a 'Group' whose operation can be thought of
+-- as commutative multiplication in some sense. Almost all multiplicative groups
+-- are abelian.
+--
 class (MultiplicativeGroup g, AbelianGroup g) => MultiplicativeAbelianGroup g
 instance MultiplicativeAbelianGroup ()
 instance MultiplicativeAbelianGroup b => MultiplicativeAbelianGroup (a -> b)
