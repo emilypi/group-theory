@@ -1,4 +1,5 @@
 {-# language BangPatterns #-}
+{-# language FlexibleInstances #-}
 {-# language Safe #-}
 -- |
 -- Module       : Data.Group
@@ -29,9 +30,14 @@ module Data.Group
 import Data.Bool
 import Data.Functor.Const
 import Data.Functor.Identity
+import Data.Int
 import Data.Monoid
 import Data.Ord
 import Data.Proxy
+import Data.Ratio
+import Data.Word
+
+import Numeric.Natural
 
 import Prelude hiding (negate)
 import qualified Prelude
@@ -62,6 +68,7 @@ class Monoid a => Group a where
 instance Group () where
   invert = id
   {-# inline invert #-}
+
 instance Group b => Group (a -> b) where
   invert f = invert . f
   {-# inline invert #-}
@@ -78,8 +85,100 @@ instance Group All where
   invert (All b) = All $ bool True False b
   {-# inline invert #-}
 
-instance Num a => Group (Sum a) where
+instance Group (Sum Integer) where
   invert = Prelude.negate
+  {-# inline invert #-}
+
+instance Group (Sum Rational) where
+  invert = Prelude.negate
+  {-# inline invert #-}
+
+instance Group (Sum Int) where
+  invert = Prelude.negate
+  {-# inline invert #-}
+
+instance Group (Sum Int8) where
+  invert = Prelude.negate
+  {-# inline invert #-}
+
+instance Group (Sum Int16) where
+  invert = Prelude.negate
+  {-# inline invert #-}
+
+instance Group (Sum Int32) where
+  invert = Prelude.negate
+  {-# inline invert #-}
+
+instance Group (Sum Int64) where
+  invert = Prelude.negate
+  {-# inline invert #-}
+
+instance Group (Sum Word) where
+  invert = Prelude.negate
+  {-# inline invert #-}
+
+instance Group (Sum Word8) where
+  invert = Prelude.negate
+  {-# inline invert #-}
+
+instance Group (Sum Word16) where
+  invert = Prelude.negate
+  {-# inline invert #-}
+
+instance Group (Sum Word32) where
+  invert = Prelude.negate
+  {-# inline invert #-}
+
+instance Group (Sum Word64) where
+  invert = Prelude.negate
+  {-# inline invert #-}
+
+instance Group (Product Rational) where
+  invert = Product . Prelude.recip . getProduct
+  {-# inline invert #-}
+
+instance Group (Product (Ratio Natural)) where
+  invert = Product . Prelude.recip . getProduct
+  {-# inline invert #-}
+
+instance Group (Product (Ratio Int)) where
+  invert = Product . Prelude.recip . getProduct
+  {-# inline invert #-}
+
+instance Group (Product (Ratio Int8)) where
+  invert = Product . Prelude.recip . getProduct
+  {-# inline invert #-}
+
+instance Group (Product (Ratio Int16)) where
+  invert = Product . Prelude.recip . getProduct
+  {-# inline invert #-}
+
+instance Group (Product (Ratio Int32)) where
+  invert = Product . Prelude.recip . getProduct
+  {-# inline invert #-}
+
+instance Group (Product (Ratio Int64)) where
+  invert = Product . Prelude.recip . getProduct
+  {-# inline invert #-}
+
+instance Group (Product (Ratio Word)) where
+  invert = Product . Prelude.recip . getProduct
+  {-# inline invert #-}
+
+instance Group (Product (Ratio Word8)) where
+  invert = Product . Prelude.recip . getProduct
+  {-# inline invert #-}
+
+instance Group (Product (Ratio Word16)) where
+  invert = Product . Prelude.recip . getProduct
+  {-# inline invert #-}
+
+instance Group (Product (Ratio Word32)) where
+  invert = Product . Prelude.recip . getProduct
+  {-# inline invert #-}
+
+instance Group (Product (Ratio Word64)) where
+  invert = Product . Prelude.recip . getProduct
   {-# inline invert #-}
 
 instance Group a => Group (Const a b) where
@@ -88,10 +187,6 @@ instance Group a => Group (Const a b) where
 
 instance Group a => Group (Identity a) where
   invert = Identity . invert . runIdentity
-  {-# inline invert #-}
-
-instance Prelude.Fractional a => Group (Product a) where
-  invert = Product . Prelude.recip . getProduct
   {-# inline invert #-}
 
 instance Group Ordering where
@@ -190,8 +285,30 @@ instance AbelianGroup b => AbelianGroup (a -> b)
 instance AbelianGroup a => AbelianGroup (Dual a)
 instance AbelianGroup Any
 instance AbelianGroup All
-instance Num a => AbelianGroup (Sum a)
-instance Fractional a => AbelianGroup (Product a)
+instance AbelianGroup (Sum Integer)
+instance AbelianGroup (Sum Rational)
+instance AbelianGroup (Sum Int)
+instance AbelianGroup (Sum Int8)
+instance AbelianGroup (Sum Int16)
+instance AbelianGroup (Sum Int32)
+instance AbelianGroup (Sum Int64)
+instance AbelianGroup (Sum Word)
+instance AbelianGroup (Sum Word8)
+instance AbelianGroup (Sum Word16)
+instance AbelianGroup (Sum Word32)
+instance AbelianGroup (Sum Word64)
+instance AbelianGroup (Product (Ratio Integer))
+instance AbelianGroup (Product (Ratio Natural))
+instance AbelianGroup (Product (Ratio Int))
+instance AbelianGroup (Product (Ratio Int8))
+instance AbelianGroup (Product (Ratio Int16))
+instance AbelianGroup (Product (Ratio Int32))
+instance AbelianGroup (Product (Ratio Int64))
+instance AbelianGroup (Product (Ratio Word))
+instance AbelianGroup (Product (Ratio Word8))
+instance AbelianGroup (Product (Ratio Word16))
+instance AbelianGroup (Product (Ratio Word32))
+instance AbelianGroup (Product (Ratio Word64))
 instance AbelianGroup a => AbelianGroup (Const a b)
 instance AbelianGroup a => AbelianGroup (Identity a)
 instance AbelianGroup a => AbelianGroup (Proxy a)
