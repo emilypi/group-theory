@@ -50,10 +50,6 @@ instance (AdditiveGroup a, AdditiveGroup b, AdditiveGroup c, AdditiveGroup d, Ad
 -- >>> x - x
 -- Any {getAny = True}
 --
--- >>> let x = All True
--- >>> x - x
--- All {getAll = False}
---
 (-) :: AdditiveGroup a => a -> a -> a
 (-) = minus
 {-# inline (-) #-}

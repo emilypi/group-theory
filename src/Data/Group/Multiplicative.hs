@@ -30,8 +30,8 @@ class AbelianGroup g => MultiplicativeGroup g
 instance MultiplicativeGroup ()
 instance MultiplicativeGroup b => MultiplicativeGroup (a -> b)
 instance MultiplicativeGroup a => MultiplicativeGroup (Dual a)
-instance MultiplicativeGroup Any
-instance Num a => MultiplicativeGroup (Sum a)
+instance MultiplicativeGroup All
+instance (Fractional a) => MultiplicativeGroup (Product a)
 instance (MultiplicativeGroup a, MultiplicativeGroup b) => MultiplicativeGroup (a,b)
 instance (MultiplicativeGroup a, MultiplicativeGroup b, MultiplicativeGroup c) => MultiplicativeGroup (a,b,c)
 instance (MultiplicativeGroup a, MultiplicativeGroup b, MultiplicativeGroup c, MultiplicativeGroup d) => MultiplicativeGroup (a,b,c,d)
