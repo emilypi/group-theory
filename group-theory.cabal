@@ -14,7 +14,7 @@ author:          Emily Pillmore
 maintainer:      emilypi@cohomolo.gy
 copyright:       (c) 2020 Emily Pillmore <emilypi@cohomolo.gy>
 category:        Algebra, Math, Permutations, Groups
-build-type:      Simple
+build-type:      Custom
 extra-doc-files:
   CHANGELOG.md
   README.md
@@ -24,6 +24,12 @@ tested-with:     GHC ==8.4.4 || ==8.6.5 || ==8.8.4 || ==8.10.2
 source-repository head
   type:     git
   location: https://github.com/emilypi/group-theory.git
+
+custom-setup
+  setup-depends:
+      base           >=4.11 && <5
+    , Cabal
+    , cabal-doctest
 
 library
   exposed-modules:
@@ -41,8 +47,20 @@ library
     Data.Group.Simple
     Data.Group.Simple.Class
 
-  other-modules:    Data.Group.Internal
   build-depends:    base >=4.11 && <5
   hs-source-dirs:   src
   default-language: Haskell2010
   ghc-options:      -Wall
+
+test-suite doctests
+  default-language:  Haskell2010
+  type:              exitcode-stdio-1.0
+  main-is:           doctests.hs
+  build-depends:
+      base          >=4.11 && <5
+    , doctest
+    , group-theory
+
+  hs-source-dirs:    test
+  ghc-options:       -Wall -threaded
+  x-doctest-options: --fast
