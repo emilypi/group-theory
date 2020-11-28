@@ -109,19 +109,15 @@ instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) wher
 -- -------------------------------------------------------------------- --
 -- Group combinators
 
--- | Apply @('<>')@, commuting its arguments.
---
--- /Note:/ When the group is abelian, @a <> b@ is identically
--- @b <> a@.
+-- | Apply @('<>')@, commuting its arguments. When the group is abelian,
+-- @a <> b@ is identically @b <> a@.
 --
 (><) :: Group a => a -> a -> a
 a >< b = b <> a
 {-# inline (><) #-}
 
 -- | Conjugate an element of a group by another element.
---
--- /Note:/ When the group is abelian, conjugation is
--- the identity.
+-- When the group is abelian, conjugation is the identity.
 --
 -- === __Examples__:
 --
@@ -154,7 +150,7 @@ order = unsafeOrder
 
 -- | Calculate the order of a particular element in a group.
 --
--- /Warning:/ elements may be infinite and explode on you if the order
+-- __Warning:__ elements may be infinite and explode on you if the order
 -- of a group element is infinite, as with any non-zero 'Integer'.
 --
 -- === __Examples__:
