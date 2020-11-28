@@ -83,7 +83,7 @@ instance MultiplicativeGroup a => MultiplicativeGroup (Proxy a)
 -- === __Examples__:
 --
 -- >>> Product (2 :: Rational) * Product (3 :: Rational)
--- Product {getProduct = 6}
+-- Product {getProduct = 6 % 1}
 --
 (*) :: MultiplicativeGroup g => g -> g -> g
 (*) = (<>)
@@ -110,8 +110,8 @@ instance MultiplicativeGroup a => MultiplicativeGroup (Proxy a)
 --
 -- === __Examples__:
 --
--- >>> power 3 $ Product (3 :: Rational)
--- Product {getProuct = 27 % 1}
+-- >>> power (Product (3 :: Rational)) 3
+-- Product {getProduct = 27 % 1}
 --
 power :: (Integral n, MultiplicativeGroup g) => g -> n -> g
 power a n = stimes n a
