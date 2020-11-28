@@ -1,4 +1,17 @@
 {-# language BangPatterns #-}
+{-# LANGUAGE Safe #-}
+-- |
+-- Module       : Data.Group
+-- Copyright    : (c) 2020 Emily Pillmore
+-- License      : BSD-style
+--
+-- Maintainer   : Emily Pillmore <emilypi@cohomolo.gy>
+-- Stability    : stable
+-- Portability  : non-portable
+--
+-- This module contains definitions for 'Group' and 'AbelianGroup',
+-- along with the relevant combinators.
+--
 module Data.Group
 ( -- * Groups
   Group(..)
