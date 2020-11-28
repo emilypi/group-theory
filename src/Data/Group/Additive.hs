@@ -1,4 +1,5 @@
-{-# language Safe #-}
+{-# language FlexibleInstances #-}
+-- {-# language Safe #-}
 -- |
 -- Module       : Data.Group.Additive
 -- Copyright    : (c) 2020 Emily Pillmore
@@ -27,9 +28,11 @@ module Data.Group.Additive
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
+import Data.Int
 import Data.Ord
 import Data.Proxy
 import Data.Semigroup
+import Data.Word
 
 import Prelude hiding ((-), (+))
 
@@ -58,7 +61,18 @@ instance AdditiveGroup ()
 instance AdditiveGroup b => AdditiveGroup (a -> b)
 instance AdditiveGroup a => AdditiveGroup (Dual a)
 instance AdditiveGroup Any
-instance Num a => AdditiveGroup (Sum a)
+instance AdditiveGroup (Sum Integer)
+instance AdditiveGroup (Sum Rational)
+instance AdditiveGroup (Sum Int)
+instance AdditiveGroup (Sum Int8)
+instance AdditiveGroup (Sum Int16)
+instance AdditiveGroup (Sum Int32)
+instance AdditiveGroup (Sum Int64)
+instance AdditiveGroup (Sum Word)
+instance AdditiveGroup (Sum Word8)
+instance AdditiveGroup (Sum Word16)
+instance AdditiveGroup (Sum Word32)
+instance AdditiveGroup (Sum Word64)
 instance (AdditiveGroup a, AdditiveGroup b) => AdditiveGroup (a,b)
 instance (AdditiveGroup a, AdditiveGroup b, AdditiveGroup c) => AdditiveGroup (a,b,c)
 instance (AdditiveGroup a, AdditiveGroup b, AdditiveGroup c, AdditiveGroup d) => AdditiveGroup (a,b,c,d)
@@ -100,7 +114,7 @@ instance AdditiveGroup Ordering
 --
 -- === __Examples__:
 --
--- >>> Sum 1 + Sum 40
+-- >>> Sum (1 :: Int) + Sum (40 :: Int)
 -- Sum {getSum = 41}
 --
 (+) :: AdditiveGroup g => g -> g -> g
@@ -116,7 +130,7 @@ instance AdditiveGroup Ordering
 --
 -- === __Examples__:
 --
--- >>> copower 2 (Sum 3)
+-- >>> copower 2 (Sum (3 :: Int))
 -- Sum {getSum = 6}
 --
 copower :: (Integral n, AdditiveGroup g) => n -> g -> g
@@ -134,7 +148,18 @@ instance AdditiveAbelianGroup ()
 instance AdditiveAbelianGroup b => AdditiveAbelianGroup (a -> b)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Dual a)
 instance AdditiveAbelianGroup Any
-instance Num a => AdditiveAbelianGroup (Sum a)
+instance AdditiveAbelianGroup (Sum Integer)
+instance AdditiveAbelianGroup (Sum Rational)
+instance AdditiveAbelianGroup (Sum Int)
+instance AdditiveAbelianGroup (Sum Int8)
+instance AdditiveAbelianGroup (Sum Int16)
+instance AdditiveAbelianGroup (Sum Int32)
+instance AdditiveAbelianGroup (Sum Int64)
+instance AdditiveAbelianGroup (Sum Word)
+instance AdditiveAbelianGroup (Sum Word8)
+instance AdditiveAbelianGroup (Sum Word16)
+instance AdditiveAbelianGroup (Sum Word32)
+instance AdditiveAbelianGroup (Sum Word64)
 instance (AdditiveAbelianGroup a, AdditiveAbelianGroup b) => AdditiveAbelianGroup (a,b)
 instance (AdditiveAbelianGroup a, AdditiveAbelianGroup b, AdditiveAbelianGroup c) => AdditiveAbelianGroup (a,b,c)
 instance (AdditiveAbelianGroup a, AdditiveAbelianGroup b, AdditiveAbelianGroup c, AdditiveAbelianGroup d) => AdditiveAbelianGroup (a,b,c,d)
