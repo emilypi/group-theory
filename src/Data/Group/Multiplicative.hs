@@ -4,6 +4,8 @@ module Data.Group.Multiplicative
   -- ** combinators
 , (/)
 , (^)
+  -- * Multiplicative abelian groups
+, MultiplicativeAbelianGroup
 ) where
 
 
@@ -65,3 +67,17 @@ instance (MultiplicativeGroup a, MultiplicativeGroup b, MultiplicativeGroup c, M
 (^) :: (Integral n, Group a) => a -> n -> a
 a ^ n = stimes n a
 {-# inline (^) #-}
+
+-- -------------------------------------------------------------------- --
+-- Multiplicative abelian groups
+
+class (MultiplicativeGroup g, AbelianGroup g) => MultiplicativeAbelianGroup g
+instance MultiplicativeAbelianGroup ()
+instance MultiplicativeAbelianGroup b => MultiplicativeAbelianGroup (a -> b)
+instance MultiplicativeAbelianGroup a => MultiplicativeAbelianGroup (Dual a)
+instance MultiplicativeAbelianGroup All
+instance (Fractional a) => MultiplicativeAbelianGroup (Product a)
+instance (MultiplicativeAbelianGroup a, MultiplicativeAbelianGroup b) => MultiplicativeAbelianGroup (a,b)
+instance (MultiplicativeAbelianGroup a, MultiplicativeAbelianGroup b, MultiplicativeAbelianGroup c) => MultiplicativeAbelianGroup (a,b,c)
+instance (MultiplicativeAbelianGroup a, MultiplicativeAbelianGroup b, MultiplicativeAbelianGroup c, MultiplicativeAbelianGroup d) => MultiplicativeAbelianGroup (a,b,c,d)
+instance (MultiplicativeAbelianGroup a, MultiplicativeAbelianGroup b, MultiplicativeAbelianGroup c, MultiplicativeAbelianGroup d, MultiplicativeAbelianGroup e) => MultiplicativeAbelianGroup (a,b,c,d,e)

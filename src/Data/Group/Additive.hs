@@ -1,9 +1,11 @@
 module Data.Group.Additive
-( -- * Additive Groups
+( -- * Additive groups
   AdditiveGroup
   -- ** Combinators
 , (-)
 , (×)
+  -- * Additive abelian groups
+, AdditiveAbelianGroup
 ) where
 
 
@@ -64,3 +66,17 @@ instance (AdditiveGroup a, AdditiveGroup b, AdditiveGroup c, AdditiveGroup d, Ad
 --
 (×) :: (Integral n, AdditiveGroup a) => n -> a -> a
 n × a = stimes n a
+
+-- -------------------------------------------------------------------- --
+-- Additive abelian groups
+
+class (AbelianGroup g, AdditiveGroup g) => AdditiveAbelianGroup g
+instance AdditiveAbelianGroup ()
+instance AdditiveAbelianGroup b => AdditiveAbelianGroup (a -> b)
+instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Dual a)
+instance AdditiveAbelianGroup Any
+instance Num a => AdditiveAbelianGroup (Sum a)
+instance (AdditiveAbelianGroup a, AdditiveAbelianGroup b) => AdditiveAbelianGroup (a,b)
+instance (AdditiveAbelianGroup a, AdditiveAbelianGroup b, AdditiveAbelianGroup c) => AdditiveAbelianGroup (a,b,c)
+instance (AdditiveAbelianGroup a, AdditiveAbelianGroup b, AdditiveAbelianGroup c, AdditiveAbelianGroup d) => AdditiveAbelianGroup (a,b,c,d)
+instance (AdditiveAbelianGroup a, AdditiveAbelianGroup b, AdditiveAbelianGroup c, AdditiveAbelianGroup d, AdditiveAbelianGroup e) => AdditiveAbelianGroup (a,b,c,d,e)

@@ -6,6 +6,7 @@ module Data.Group
 , (><)
 , conjugate
 , order
+, unsafeOrder
   -- * Abelian groups
 , AbelianGroup
 ) where
@@ -13,7 +14,6 @@ module Data.Group
 
 import Data.Bool
 import Data.Monoid
-import Data.Semigroup
 
 import Prelude hiding (negate)
 import qualified Prelude
@@ -94,6 +94,7 @@ instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) wher
 --
 (><) :: Group a => a -> a -> a
 a >< b = b <> a
+{-# inline (><) #-}
 
 -- | Conjugate an element of a group by another element.
 --
@@ -115,8 +116,7 @@ conjugate a b = (b <> a) `minus` b
 {-# inline conjugate #-}
 
 -- | Calculate the order of a particular element in a group.
---
--- /Warning:/ may be infinite and explode on you.
+-- Since all elements are bounded, this will be at most @maxBound a@.
 --
 -- === __Examples__:
 --
@@ -126,11 +126,29 @@ conjugate a b = (b <> a) `minus` b
 -- >>> order (Any False)
 -- 0
 --
-order :: (Eq a, Group a) => a -> Integer
-order = go 0 where
+order :: (Bounded a, Eq a, Group a) => a -> Integer
+order = unsafeOrder
+{-# inline order #-}
+
+-- | Calculate the order of a particular element in a group.
+--
+-- /Warning:/ elements may be infinite and explode on you if the order
+-- of a group element is infinite, as with any non-zero 'Integer'.
+--
+-- === __Examples__:
+--
+-- >>> unsafeOrder @(Sum Int) 3
+-- 64
+--
+-- >>> unsafeOrder (Any False)
+-- 0
+--
+unsafeOrder :: (Eq a, Group a) => a -> Integer
+unsafeOrder = go 0 where
   go !n g
     | g == mempty = n
     | otherwise = go (succ n) (g <> g)
+{-# inline unsafeOrder #-}
 
 -- -------------------------------------------------------------------- --
 -- Abelian (commutative) groups
