@@ -66,6 +66,7 @@ instance (AdditiveGroup a, AdditiveGroup b, AdditiveGroup c, AdditiveGroup d, Ad
 --
 (×) :: (Integral n, AdditiveGroup a) => n -> a -> a
 n × a = stimes n a
+{-# inline (×) #-}
 
 -- -------------------------------------------------------------------- --
 -- Additive abelian groups
