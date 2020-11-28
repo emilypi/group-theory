@@ -9,7 +9,10 @@ module Data.Group.Multiplicative
 ) where
 
 
+import Data.Functor.Const
+import Data.Functor.Identity
 import Data.Group
+import Data.Proxy
 import Data.Semigroup
 
 import Prelude hiding ((^), (/))
@@ -38,7 +41,9 @@ instance (MultiplicativeGroup a, MultiplicativeGroup b) => MultiplicativeGroup (
 instance (MultiplicativeGroup a, MultiplicativeGroup b, MultiplicativeGroup c) => MultiplicativeGroup (a,b,c)
 instance (MultiplicativeGroup a, MultiplicativeGroup b, MultiplicativeGroup c, MultiplicativeGroup d) => MultiplicativeGroup (a,b,c,d)
 instance (MultiplicativeGroup a, MultiplicativeGroup b, MultiplicativeGroup c, MultiplicativeGroup d, MultiplicativeGroup e) => MultiplicativeGroup (a,b,c,d,e)
-
+instance MultiplicativeGroup a => MultiplicativeGroup (Const a b)
+instance MultiplicativeGroup a => MultiplicativeGroup (Identity a)
+instance MultiplicativeGroup a => MultiplicativeGroup (Proxy a)
 
 -- | Infix alias for 'minus'.
 --
@@ -81,3 +86,6 @@ instance (MultiplicativeAbelianGroup a, MultiplicativeAbelianGroup b) => Multipl
 instance (MultiplicativeAbelianGroup a, MultiplicativeAbelianGroup b, MultiplicativeAbelianGroup c) => MultiplicativeAbelianGroup (a,b,c)
 instance (MultiplicativeAbelianGroup a, MultiplicativeAbelianGroup b, MultiplicativeAbelianGroup c, MultiplicativeAbelianGroup d) => MultiplicativeAbelianGroup (a,b,c,d)
 instance (MultiplicativeAbelianGroup a, MultiplicativeAbelianGroup b, MultiplicativeAbelianGroup c, MultiplicativeAbelianGroup d, MultiplicativeAbelianGroup e) => MultiplicativeAbelianGroup (a,b,c,d,e)
+instance MultiplicativeAbelianGroup a => MultiplicativeAbelianGroup (Const a b)
+instance MultiplicativeAbelianGroup a => MultiplicativeAbelianGroup (Identity a)
+instance MultiplicativeAbelianGroup a => MultiplicativeAbelianGroup (Proxy a)

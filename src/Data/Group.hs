@@ -183,6 +183,10 @@ instance AbelianGroup Any
 instance AbelianGroup All
 instance Num a => AbelianGroup (Sum a)
 instance Fractional a => AbelianGroup (Product a)
+instance AbelianGroup a => AbelianGroup (Const a b)
+instance AbelianGroup a => AbelianGroup (Identity a)
+instance AbelianGroup a => AbelianGroup (Proxy a)
+instance AbelianGroup Ordering
 instance (AbelianGroup a, AbelianGroup b) => AbelianGroup (a,b)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c) => AbelianGroup (a,b,c)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d) => AbelianGroup (a,b,c,d)

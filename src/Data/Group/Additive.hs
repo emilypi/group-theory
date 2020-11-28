@@ -9,7 +9,11 @@ module Data.Group.Additive
 ) where
 
 
+import Data.Functor.Const
+import Data.Functor.Identity
 import Data.Group
+import Data.Ord
+import Data.Proxy
 import Data.Semigroup
 
 import Prelude hiding ((-))
@@ -38,7 +42,10 @@ instance (AdditiveGroup a, AdditiveGroup b) => AdditiveGroup (a,b)
 instance (AdditiveGroup a, AdditiveGroup b, AdditiveGroup c) => AdditiveGroup (a,b,c)
 instance (AdditiveGroup a, AdditiveGroup b, AdditiveGroup c, AdditiveGroup d) => AdditiveGroup (a,b,c,d)
 instance (AdditiveGroup a, AdditiveGroup b, AdditiveGroup c, AdditiveGroup d, AdditiveGroup e) => AdditiveGroup (a,b,c,d,e)
-
+instance AdditiveGroup a => AdditiveGroup (Const a b)
+instance AdditiveGroup a => AdditiveGroup (Identity a)
+instance AdditiveGroup a => AdditiveGroup (Proxy a)
+instance AdditiveGroup Ordering
 
 -- | Infix alias for 'minus'.
 --
@@ -81,3 +88,7 @@ instance (AdditiveAbelianGroup a, AdditiveAbelianGroup b) => AdditiveAbelianGrou
 instance (AdditiveAbelianGroup a, AdditiveAbelianGroup b, AdditiveAbelianGroup c) => AdditiveAbelianGroup (a,b,c)
 instance (AdditiveAbelianGroup a, AdditiveAbelianGroup b, AdditiveAbelianGroup c, AdditiveAbelianGroup d) => AdditiveAbelianGroup (a,b,c,d)
 instance (AdditiveAbelianGroup a, AdditiveAbelianGroup b, AdditiveAbelianGroup c, AdditiveAbelianGroup d, AdditiveAbelianGroup e) => AdditiveAbelianGroup (a,b,c,d,e)
+instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Const a b)
+instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Identity a)
+instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Proxy a)
+instance AdditiveAbelianGroup Ordering
