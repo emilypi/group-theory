@@ -1,3 +1,16 @@
+{-# language Safe #-}
+-- |
+-- Module       : Data.Group.Multiplicative
+-- Copyright    : (c) 2020 Emily Pillmore
+-- License      : BSD-style
+--
+-- Maintainer   : Emily Pillmore <emilypi@cohomolo.gy>
+-- Stability    : stable
+-- Portability  : non-portable
+--
+-- This module contains definitions for 'MultiplicativeGroup' and
+-- 'MultiplicativeAbelianGroup', along with the relevant combinators.
+--
 module Data.Group.Multiplicative
 ( -- * Multiplicative Groups
   MultiplicativeGroup

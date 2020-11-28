@@ -1,5 +1,5 @@
 {-# language BangPatterns #-}
-{-# LANGUAGE Safe #-}
+{-# language Safe #-}
 -- |
 -- Module       : Data.Group
 -- Copyright    : (c) 2020 Emily Pillmore
