@@ -1,5 +1,5 @@
 {-# language FlexibleInstances #-}
-{-# language Safe #-}
+-- {-# language Safe #-}
 -- |
 -- Module       : Data.Group.Additive
 -- Copyright    : (c) 2020 Emily Pillmore

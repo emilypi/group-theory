@@ -18,6 +18,7 @@ module Data.Group.Cyclic
   CyclicGroup(..)
   -- ** Combinators
 , generate
+, classify
 ) where
 
 import Data.Functor.Const
@@ -63,51 +64,51 @@ instance CyclicGroup a => CyclicGroup (Dual a) where
   {-# inlinable generator #-}
 
 instance CyclicGroup (Sum Integer) where
-  generator = 0
+  generator = 1
   {-# inline generator #-}
 
 instance CyclicGroup (Sum Rational) where
-  generator = 0
+  generator = 1
   {-# inline generator #-}
 
 instance CyclicGroup (Sum Int) where
-  generator = 0
+  generator = 1
   {-# inline generator #-}
 
 instance CyclicGroup (Sum Int8) where
-  generator = 0
+  generator = 1
   {-# inline generator #-}
 
 instance CyclicGroup (Sum Int16) where
-  generator = 0
+  generator = 1
   {-# inline generator #-}
 
 instance CyclicGroup (Sum Int32) where
-  generator = 0
+  generator = 1
   {-# inline generator #-}
 
 instance CyclicGroup (Sum Int64) where
-  generator = 0
+  generator = 1
   {-# inline generator #-}
 
 instance CyclicGroup (Sum Word) where
-  generator = 0
+  generator = 1
   {-# inline generator #-}
 
 instance CyclicGroup (Sum Word8) where
-  generator = 0
+  generator = 1
   {-# inline generator #-}
 
 instance CyclicGroup (Sum Word16) where
-  generator = 0
+  generator = 1
   {-# inline generator #-}
 
 instance CyclicGroup (Sum Word32) where
-  generator = 0
+  generator = 1
   {-# inline generator #-}
 
 instance CyclicGroup (Sum Word64) where
-  generator = 0
+  generator = 1
   {-# inline generator #-}
 
 instance CyclicGroup a => CyclicGroup (Const a b) where

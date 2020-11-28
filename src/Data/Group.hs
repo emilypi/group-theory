@@ -252,7 +252,7 @@ conjugate a b = (b <> a) `minus` b
 -- >>> order (Any False)
 -- 0
 --
-order :: (Bounded a, Eq a, Group a) => a -> Integer
+order :: (Bounded a, Show a, Eq a, Group a) => a -> Integer
 order = unsafeOrder
 {-# inline order #-}
 
@@ -269,11 +269,11 @@ order = unsafeOrder
 -- >>> unsafeOrder (Any False)
 -- 0
 --
-unsafeOrder :: (Eq a, Group a) => a -> Integer
-unsafeOrder = go 0 where
+unsafeOrder :: (Eq a, Show a, Group a) => a -> Integer
+unsafeOrder a = go 0 a where
   go !n g
     | g == mempty = n
-    | otherwise = go (succ n) (g <> g)
+    | otherwise = go (succ n) (g <> a)
 {-# inline unsafeOrder #-}
 
 -- -------------------------------------------------------------------- --
