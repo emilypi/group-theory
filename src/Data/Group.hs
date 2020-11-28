@@ -12,8 +12,13 @@ module Data.Group
 ) where
 
 
+
 import Data.Bool
+import Data.Functor.Const
+import Data.Functor.Identity
 import Data.Monoid
+import Data.Ord
+import Data.Proxy
 
 import Prelude hiding (negate)
 import qualified Prelude
@@ -64,13 +69,30 @@ instance Num a => Group (Sum a) where
   invert = Prelude.negate
   {-# inline invert #-}
 
+instance Group a => Group (Const a b) where
+  invert = Const . invert . getConst
+  {-# inline invert #-}
+
+instance Group a => Group (Identity a) where
+  invert = Identity . invert . runIdentity
+  {-# inline invert #-}
+
 instance Prelude.Fractional a => Group (Product a) where
   invert = Product . Prelude.recip . getProduct
+  {-# inline invert #-}
+
+instance Group Ordering where
+  invert LT = GT
+  invert EQ = EQ
+  invert GT = LT
   {-# inline invert #-}
 
 instance (Group a, Group b) => Group (a,b) where
   invert ~(a,b) = (invert a, invert b)
   {-# inline invert #-}
+
+instance Group a => Group (Proxy a) where
+  invert _ = Proxy
 
 instance (Group a, Group b, Group c) => Group (a,b,c) where
   invert ~(a,b,c) = (invert a, invert b, invert c)
@@ -87,19 +109,15 @@ instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) wher
 -- -------------------------------------------------------------------- --
 -- Group combinators
 
--- | Apply @('<>')@, commuting its arguments.
---
--- /Note:/ When the group is abelian, @a <> b@ is identically
--- @b <> a@.
+-- | Apply @('<>')@, commuting its arguments. When the group is abelian,
+-- @a <> b@ is identically @b <> a@.
 --
 (><) :: Group a => a -> a -> a
 a >< b = b <> a
 {-# inline (><) #-}
 
 -- | Conjugate an element of a group by another element.
---
--- /Note:/ When the group is abelian, conjugation is
--- the identity.
+-- When the group is abelian, conjugation is the identity.
 --
 -- === __Examples__:
 --
@@ -132,7 +150,7 @@ order = unsafeOrder
 
 -- | Calculate the order of a particular element in a group.
 --
--- /Warning:/ elements may be infinite and explode on you if the order
+-- __Warning:__ elements may be infinite and explode on you if the order
 -- of a group element is infinite, as with any non-zero 'Integer'.
 --
 -- === __Examples__:
@@ -161,6 +179,10 @@ instance AbelianGroup Any
 instance AbelianGroup All
 instance Num a => AbelianGroup (Sum a)
 instance Fractional a => AbelianGroup (Product a)
+instance AbelianGroup a => AbelianGroup (Const a b)
+instance AbelianGroup a => AbelianGroup (Identity a)
+instance AbelianGroup a => AbelianGroup (Proxy a)
+instance AbelianGroup Ordering
 instance (AbelianGroup a, AbelianGroup b) => AbelianGroup (a,b)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c) => AbelianGroup (a,b,c)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d) => AbelianGroup (a,b,c,d)
