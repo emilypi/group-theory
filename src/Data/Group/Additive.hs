@@ -114,7 +114,7 @@ instance AdditiveGroup Ordering
 --
 -- === __Examples__:
 --
--- >>> Sum 1 + Sum 40
+-- >>> Sum (1 :: Int) + Sum (40 :: Int)
 -- Sum {getSum = 41}
 --
 (+) :: AdditiveGroup g => g -> g -> g
@@ -130,7 +130,7 @@ instance AdditiveGroup Ordering
 --
 -- === __Examples__:
 --
--- >>> copower 2 (Sum 3)
+-- >>> copower 2 (Sum (3 :: Int))
 -- Sum {getSum = 6}
 --
 copower :: (Integral n, AdditiveGroup g) => n -> g -> g

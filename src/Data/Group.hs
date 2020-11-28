@@ -246,8 +246,8 @@ conjugate a b = (b <> a) `minus` b
 --
 -- === __Examples__:
 --
--- >>> order @(Sum Int) 3
--- 64
+-- >>> order @(Sum Word8) 3
+-- 255
 --
 -- >>> order (Any False)
 -- 0
@@ -263,8 +263,8 @@ order = unsafeOrder
 --
 -- === __Examples__:
 --
--- >>> unsafeOrder @(Sum Int) 3
--- 64
+-- >>> unsafeOrder @(Sum Word8) 3
+-- 255
 --
 -- >>> unsafeOrder (Any False)
 -- 0
