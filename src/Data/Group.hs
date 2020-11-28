@@ -3,8 +3,6 @@ module Data.Group
 ( -- * Groups
   Group(..)
   -- ** Group combinators
-, (-)
-, (^)
 , (><)
 , conjugate
 , order
@@ -17,14 +15,8 @@ import Data.Bool
 import Data.Monoid
 import Data.Semigroup
 
-import Prelude hiding ((-), (^), negate)
+import Prelude hiding (negate)
 import qualified Prelude
-
-
-infixl 6 -
-infixr 6 ><
-infixr 8 ^
-
 
 -- $setup
 --
@@ -34,6 +26,7 @@ infixr 8 ^
 -- >>> import Data.Semigroup
 -- >>> :set -XTypeApplications
 
+infixr 6 ><
 
 -- -------------------------------------------------------------------- --
 -- Groups
@@ -94,48 +87,18 @@ instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) wher
 -- -------------------------------------------------------------------- --
 -- Group combinators
 
--- | Infix alias for 'minus'.
---
--- === __Examples__:
---
--- >>> let x = Sum (3 :: Int)
--- >>> x - x
--- Sum {getSum = 0}
---
--- >>> let x = Any True
--- >>> x - x
--- Any {getAny = True}
---
--- >>> let x = All True
--- >>> x - x
--- All {getAll = False}
---
-(-) :: Group a => a -> a -> a
-(-) = minus
-{-# inline (-) #-}
-
--- | Infix alias for 'stimes'.
---
--- === __Examples__:
---
--- >>> let x = Sum (3 :: Int)
--- >>> x ^ 3
--- Sum {getSum = 9}
---
--- >>> let x = Product (3 :: Rational)
--- >>> x ^ 3
--- Product {getProduct = 27 % 1}
---
-(^) :: (Integral n, Group a) => a -> n -> a
-a ^ n = stimes n a
-{-# inline (^) #-}
-
 -- | Apply @('<>')@, commuting its arguments.
+--
+-- /Note:/ When the group is abelian, @a <> b@ is identically
+-- @b <> a@.
 --
 (><) :: Group a => a -> a -> a
 a >< b = b <> a
 
 -- | Conjugate an element of a group by another element.
+--
+-- /Note:/ When the group is abelian, conjugation is
+-- the identity.
 --
 -- === __Examples__:
 --
@@ -148,7 +111,7 @@ a >< b = b <> a
 -- All {getAll = False}
 --
 conjugate :: Group a => a -> a -> a
-conjugate a b = (b <> a) - b
+conjugate a b = (b <> a) `minus` b
 {-# inline conjugate #-}
 
 -- | Calculate the order of a particular element in a group.
