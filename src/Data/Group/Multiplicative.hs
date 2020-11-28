@@ -62,7 +62,7 @@ instance MultiplicativeGroup a => MultiplicativeGroup (Const a b)
 instance MultiplicativeGroup a => MultiplicativeGroup (Identity a)
 instance MultiplicativeGroup a => MultiplicativeGroup (Proxy a)
 
--- | Infix alias for 'minus'.
+-- | Infix alias for multiplicative inverse.
 --
 -- === __Examples__:
 --
@@ -70,15 +70,11 @@ instance MultiplicativeGroup a => MultiplicativeGroup (Proxy a)
 -- >>> x / 2
 -- Product {getProduct = 2 % 1}
 --
--- >>> let x = All True
--- >>> x / x
--- All {getAll = False}
---
 (/) :: MultiplicativeGroup a => a -> a -> a
 (/) = minus
 {-# inline (/) #-}
 
--- | Infix alias for 'stimes'.
+-- | Infix alias for 'power'.
 --
 -- === __Examples__:
 --

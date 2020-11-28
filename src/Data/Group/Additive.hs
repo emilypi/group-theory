@@ -80,7 +80,7 @@ instance AdditiveGroup Ordering
 (-) = minus
 {-# inline (-) #-}
 
--- | Add an element to itself @n@-many times.
+-- | Infix alias for 'copower'.
 --
 -- === __Examples__:
 --
