@@ -32,7 +32,11 @@ infixl 7 ×
 -- -------------------------------------------------------------------- --
 -- Additive groups
 
-class AbelianGroup g => AdditiveGroup g
+class AbelianGroup g => AdditiveGroup g where
+  copower :: Integral n => n -> g -> g
+  copower = stimes
+  {-# inline copower #-}
+
 instance AdditiveGroup ()
 instance AdditiveGroup b => AdditiveGroup (a -> b)
 instance AdditiveGroup a => AdditiveGroup (Dual a)
@@ -72,7 +76,7 @@ instance AdditiveGroup Ordering
 -- Sum {getSum = 6}
 --
 (×) :: (Integral n, AdditiveGroup a) => n -> a -> a
-n × a = stimes n a
+(×) = copower
 {-# inline (×) #-}
 
 -- -------------------------------------------------------------------- --

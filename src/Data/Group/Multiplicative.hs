@@ -31,7 +31,11 @@ infixr 8 ^
 -- -------------------------------------------------------------------- --
 -- Multiplicative groups
 
-class AbelianGroup g => MultiplicativeGroup g
+class AbelianGroup g => MultiplicativeGroup g where
+  power :: Integral n => g -> n -> g
+  power a n = stimes n a
+  {-# inline power #-}
+
 instance MultiplicativeGroup ()
 instance MultiplicativeGroup b => MultiplicativeGroup (a -> b)
 instance MultiplicativeGroup a => MultiplicativeGroup (Dual a)
@@ -69,8 +73,8 @@ instance MultiplicativeGroup a => MultiplicativeGroup (Proxy a)
 -- >>> x ^ 3
 -- Product {getProduct = 27 % 1}
 --
-(^) :: (Integral n, Group a) => a -> n -> a
-a ^ n = stimes n a
+(^) :: (Integral n, MultiplicativeGroup a) => a -> n -> a
+(^) = power
 {-# inline (^) #-}
 
 -- -------------------------------------------------------------------- --
