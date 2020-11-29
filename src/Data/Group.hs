@@ -19,8 +19,8 @@ module Data.Group
   -- ** Group combinators
 , (><)
 , conjugate
-, order
-, unsafeOrder
+, exponent
+, unsafeExponent
   -- * Abelian groups
 , AbelianGroup
 ) where
@@ -39,7 +39,7 @@ import Data.Word
 
 import Numeric.Natural
 
-import Prelude hiding (negate)
+import Prelude hiding (negate, exponent)
 import qualified Prelude
 
 -- $setup
@@ -241,40 +241,40 @@ conjugate :: Group a => a -> a -> a
 conjugate a b = (b <> a) `minus` b
 {-# inline conjugate #-}
 
--- | Calculate the order of a particular element in a group.
+-- | Calculate the exponent of a particular element in a group.
 -- Since all elements are bounded, this will be at most @maxBound a@.
 --
 -- === __Examples__:
 --
--- >>> order @(Sum Word8) 3
+-- >>> exponent @(Sum Word8) 3
 -- 255
 --
--- >>> order (Any False)
+-- >>> exponent (Any False)
 -- 0
 --
-order :: (Bounded a, Show a, Eq a, Group a) => a -> Integer
-order = unsafeOrder
-{-# inline order #-}
+exponent :: (Bounded a, Show a, Eq a, Group a) => a -> Integer
+exponent = unsafeExponent
+{-# inline exponent #-}
 
--- | Calculate the order of a particular element in a group.
+-- | Calculate the exponent of a particular element in a group.
 --
--- __Warning:__ elements may be infinite and explode on you if the order
+-- __Warning:__ elements may be infinite and explode on you if the exponent
 -- of a group element is infinite, as with any non-zero 'Integer'.
 --
 -- === __Examples__:
 --
--- >>> unsafeOrder @(Sum Word8) 3
+-- >>> unsafeExponent @(Sum Word8) 3
 -- 255
 --
--- >>> unsafeOrder (Any False)
+-- >>> unsafeExponent (Any False)
 -- 0
 --
-unsafeOrder :: (Eq a, Show a, Group a) => a -> Integer
-unsafeOrder a = go 0 a where
+unsafeExponent :: (Eq a, Show a, Group a) => a -> Integer
+unsafeExponent a = go 0 a where
   go !n g
     | g == mempty = n
     | otherwise = go (succ n) (g <> a)
-{-# inline unsafeOrder #-}
+{-# inline unsafeExponent #-}
 
 -- -------------------------------------------------------------------- --
 -- Abelian (commutative) groups

@@ -35,19 +35,15 @@ library
   exposed-modules:
     Data.Group
     Data.Group.Additive
-    Data.Group.Additive.Class
     Data.Group.Cyclic
-    Data.Group.Cyclic.Class
     Data.Group.Finite
-    Data.Group.Finite.Class
     Data.Group.Multiplicative
-    Data.Group.Multiplicative.Class
     Data.Group.Permutation
-    Data.Group.Permutation.Class
     Data.Group.Simple
-    Data.Group.Simple.Class
 
   build-depends:    base >=4.11 && <5
+                  , reflection
+
   hs-source-dirs:   src
   default-language: Haskell2010
   ghc-options:      -Wall
