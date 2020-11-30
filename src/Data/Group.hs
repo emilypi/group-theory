@@ -21,7 +21,8 @@ module Data.Group
   -- ** Group combinators
 , (><)
 , conjugate
-  -- ** Group patterns
+  -- ** Group order
+, Order(..)
 , pattern Infinity
 , pattern Finitary
   -- * Abelian groups
@@ -220,6 +221,33 @@ instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) wher
 -- -------------------------------------------------------------------- --
 -- Group combinators
 
+-- | Apply @('<>')@, commuting its arguments. When the group is abelian,
+-- @a <> b@ is identically @b <> a@.
+--
+(><) :: Group a => a -> a -> a
+a >< b = b <> a
+{-# inline (><) #-}
+
+-- | Conjugate an element of a group by another element.
+-- When the group is abelian, conjugation is the identity.
+--
+-- === __Examples__:
+--
+-- >>> let x = Sum (3 :: Int)
+-- >>> conjugate x x
+-- Sum {getSum = 3}
+--
+-- >>> let x = All True
+-- >>> conjugate x (All False)
+-- All {getAll = False}
+--
+conjugate :: Group a => a -> a -> a
+conjugate a b = (b <> a) `minus` b
+{-# inline conjugate #-}
+
+-- -------------------------------------------------------------------- --
+-- Group order
+
 -- | The order of a group element.
 --
 -- The order of a group element can either be infinite,
@@ -232,13 +260,13 @@ data Order = Infinite | Finite {-# unpack #-} !Natural
 -- | Unidirectional pattern synonym for the infinite order of a
 -- group element
 --
-pattern Infinity :: (Eq g, Group g) => () => g
+pattern Infinity :: () => (Eq g, Group g) => g
 pattern Infinity <- (order -> Infinite)
 
 -- | Unidirectional pattern synonym for the finite order of a
 -- group element
 --
-pattern Finitary :: (Eq g, Group g) => () => Natural -> g
+pattern Finitary :: () => (Eq g, Group g) => Natural -> g
 pattern Finitary n <- (order -> Finite n)
 
 -- | Calculate the exponent of a particular element in a group.
@@ -266,30 +294,6 @@ order a = go 0 a where
     | g == a, n > 0 = Infinite
     | otherwise = go (succ n) (g <> a)
 {-# inline order #-}
-
--- | Apply @('<>')@, commuting its arguments. When the group is abelian,
--- @a <> b@ is identically @b <> a@.
---
-(><) :: Group a => a -> a -> a
-a >< b = b <> a
-{-# inline (><) #-}
-
--- | Conjugate an element of a group by another element.
--- When the group is abelian, conjugation is the identity.
---
--- === __Examples__:
---
--- >>> let x = Sum (3 :: Int)
--- >>> conjugate x x
--- Sum {getSum = 3}
---
--- >>> let x = All True
--- >>> conjugate x (All False)
--- All {getAll = False}
---
-conjugate :: Group a => a -> a -> a
-conjugate a b = (b <> a) `minus` b
-{-# inline conjugate #-}
 
 -- -------------------------------------------------------------------- --
 -- Abelian (commutative) groups
