@@ -260,13 +260,13 @@ data Order = Infinite | Finite {-# unpack #-} !Natural
 -- | Unidirectional pattern synonym for the infinite order of a
 -- group element
 --
-pattern Infinity :: () => (Eq g, Group g) => g
+pattern Infinity :: (Eq g, Group g) => () => g
 pattern Infinity <- (order -> Infinite)
 
 -- | Unidirectional pattern synonym for the finite order of a
--- group element
+-- group elementd
 --
-pattern Finitary :: () => (Eq g, Group g) => Natural -> g
+pattern Finitary :: (Eq g, Group g) => () => Natural -> g
 pattern Finitary n <- (order -> Finite n)
 
 -- | Calculate the exponent of a particular element in a group.
@@ -281,7 +281,8 @@ pattern Finitary n <- (order -> Finite n)
 -- Finite 255
 --
 -- >>> order (Any False)
--- Finite 0
+-- Finite 1
+--
 -- >>> order (All False)
 -- Infinite
 --
