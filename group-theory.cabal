@@ -41,6 +41,9 @@ library
     Data.Group.Permutation
     Data.Group.Simple
 
+  other-modules:
+    Data.Group.Internal.Singletons
+
   build-depends:    base >=4.11 && <5
                   , reflection
 

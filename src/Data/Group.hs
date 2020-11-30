@@ -1,6 +1,8 @@
 {-# language BangPatterns #-}
 {-# language FlexibleInstances #-}
+{-# language PatternSynonyms #-}
 {-# language Safe #-}
+{-# language ViewPatterns #-}
 -- |
 -- Module       : Data.Group
 -- Copyright    : (c) 2020 Emily Pillmore
@@ -19,8 +21,9 @@ module Data.Group
   -- ** Group combinators
 , (><)
 , conjugate
-, exponent
-, unsafeExponent
+  -- ** Group patterns
+, pattern Infinity
+, pattern Finitary
   -- * Abelian groups
 , AbelianGroup
 ) where
@@ -217,6 +220,53 @@ instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) wher
 -- -------------------------------------------------------------------- --
 -- Group combinators
 
+-- | The order of a group element.
+--
+-- The order of a group element can either be infinite,
+-- as in the case of @All False@, or finite, as in the
+-- case of @All True@.
+--
+data Order = Infinite | Finite {-# unpack #-} !Natural
+  deriving (Eq, Show)
+
+-- | Unidirectional pattern synonym for the infinite order of a
+-- group element
+--
+pattern Infinity :: (Eq g, Group g) => () => g
+pattern Infinity <- (order -> Infinite)
+
+-- | Unidirectional pattern synonym for the finite order of a
+-- group element
+--
+pattern Finitary :: (Eq g, Group g) => () => Natural -> g
+pattern Finitary n <- (order -> Finite n)
+
+-- | Calculate the exponent of a particular element in a group.
+--
+-- __Warning:__ If 'order' expects a 'FiniteGroup', this is gauranteed
+-- to terminate. However, this is not true of groups in general. This will
+-- spin forever if you give it something like non-zero @Sum Integer@.
+--
+-- === __Examples__:
+--
+-- >>> order @(Sum Word8) 3
+-- Finite 255
+--
+-- >>> order (Any False)
+-- Finite 0
+-- >>> order (All False)
+-- Infinite
+--
+order :: (Eq g, Group g) => g -> Order
+order a = go 0 a where
+  go !n g
+    -- guard against ().
+    | g == mempty, n > 0 = Finite n
+    -- guard against infinite cases like @All False@.
+    | g == a, n > 0 = Infinite
+    | otherwise = go (succ n) (g <> a)
+{-# inline order #-}
+
 -- | Apply @('<>')@, commuting its arguments. When the group is abelian,
 -- @a <> b@ is identically @b <> a@.
 --
@@ -240,41 +290,6 @@ a >< b = b <> a
 conjugate :: Group a => a -> a -> a
 conjugate a b = (b <> a) `minus` b
 {-# inline conjugate #-}
-
--- | Calculate the exponent of a particular element in a group.
--- Since all elements are bounded, this will be at most @maxBound a@.
---
--- === __Examples__:
---
--- >>> exponent @(Sum Word8) 3
--- 255
---
--- >>> exponent (Any False)
--- 0
---
-exponent :: (Bounded a, Show a, Eq a, Group a) => a -> Integer
-exponent = unsafeExponent
-{-# inline exponent #-}
-
--- | Calculate the exponent of a particular element in a group.
---
--- __Warning:__ elements may be infinite and explode on you if the exponent
--- of a group element is infinite, as with any non-zero 'Integer'.
---
--- === __Examples__:
---
--- >>> unsafeExponent @(Sum Word8) 3
--- 255
---
--- >>> unsafeExponent (Any False)
--- 0
---
-unsafeExponent :: (Eq a, Show a, Group a) => a -> Integer
-unsafeExponent a = go 0 a where
-  go !n g
-    | g == mempty = n
-    | otherwise = go (succ n) (g <> a)
-{-# inline unsafeExponent #-}
 
 -- -------------------------------------------------------------------- --
 -- Abelian (commutative) groups
