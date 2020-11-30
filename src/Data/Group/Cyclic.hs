@@ -55,9 +55,9 @@ instance CyclicGroup () where
   generator = ()
   {-# inline generator #-}
 
-instance CyclicGroup b => CyclicGroup (a -> b) where
-  generator = const generator
-  {-# inlinable generator #-}
+-- instance CyclicGroup b => CyclicGroup (a -> b) where
+--   generator = const generator
+--   {-# inlinable generator #-}
 
 instance CyclicGroup a => CyclicGroup (Dual a) where
   generator = Dual (invert generator)

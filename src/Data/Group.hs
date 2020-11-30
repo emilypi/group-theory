@@ -1,6 +1,8 @@
 {-# language BangPatterns #-}
 {-# language FlexibleInstances #-}
+{-# language PatternSynonyms #-}
 {-# language Safe #-}
+{-# language ViewPatterns #-}
 -- |
 -- Module       : Data.Group
 -- Copyright    : (c) 2020 Emily Pillmore
@@ -19,8 +21,10 @@ module Data.Group
   -- ** Group combinators
 , (><)
 , conjugate
-, order
-, unsafeOrder
+  -- ** Group order
+, Order(..)
+, pattern Infinity
+, pattern Finitary
   -- * Abelian groups
 , AbelianGroup
 ) where
@@ -39,7 +43,7 @@ import Data.Word
 
 import Numeric.Natural
 
-import Prelude hiding (negate)
+import Prelude hiding (negate, exponent)
 import qualified Prelude
 
 -- $setup
@@ -241,40 +245,56 @@ conjugate :: Group a => a -> a -> a
 conjugate a b = (b <> a) `minus` b
 {-# inline conjugate #-}
 
--- | Calculate the order of a particular element in a group.
--- Since all elements are bounded, this will be at most @maxBound a@.
+-- -------------------------------------------------------------------- --
+-- Group order
+
+-- | The order of a group element.
+--
+-- The order of a group element can either be infinite,
+-- as in the case of @All False@, or finite, as in the
+-- case of @All True@.
+--
+data Order = Infinite | Finite {-# unpack #-} !Natural
+  deriving (Eq, Show)
+
+-- | Unidirectional pattern synonym for the infinite order of a
+-- group element
+--
+pattern Infinity :: (Eq g, Group g) => () => g
+pattern Infinity <- (order -> Infinite)
+
+-- | Unidirectional pattern synonym for the finite order of a
+-- group elementd
+--
+pattern Finitary :: (Eq g, Group g) => () => Natural -> g
+pattern Finitary n <- (order -> Finite n)
+
+-- | Calculate the exponent of a particular element in a group.
+--
+-- __Warning:__ If 'order' expects a 'FiniteGroup', this is gauranteed
+-- to terminate. However, this is not true of groups in general. This will
+-- spin forever if you give it something like non-zero @Sum Integer@.
 --
 -- === __Examples__:
 --
 -- >>> order @(Sum Word8) 3
--- 255
+-- Finite 255
 --
 -- >>> order (Any False)
--- 0
+-- Finite 1
 --
-order :: (Bounded a, Show a, Eq a, Group a) => a -> Integer
-order = unsafeOrder
-{-# inline order #-}
-
--- | Calculate the order of a particular element in a group.
+-- >>> order (All False)
+-- Infinite
 --
--- __Warning:__ elements may be infinite and explode on you if the order
--- of a group element is infinite, as with any non-zero 'Integer'.
---
--- === __Examples__:
---
--- >>> unsafeOrder @(Sum Word8) 3
--- 255
---
--- >>> unsafeOrder (Any False)
--- 0
---
-unsafeOrder :: (Eq a, Show a, Group a) => a -> Integer
-unsafeOrder a = go 0 a where
+order :: (Eq g, Group g) => g -> Order
+order a = go 0 a where
   go !n g
-    | g == mempty = n
+    -- guard against ().
+    | g == mempty, n > 0 = Finite n
+    -- guard against infinite cases like @All False@.
+    | g == a, n > 0 = Infinite
     | otherwise = go (succ n) (g <> a)
-{-# inline unsafeOrder #-}
+{-# inline order #-}
 
 -- -------------------------------------------------------------------- --
 -- Abelian (commutative) groups
