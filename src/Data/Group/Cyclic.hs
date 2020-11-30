@@ -30,7 +30,6 @@ import Data.Monoid
 import Data.Proxy
 import Data.Word
 
-
 -- $setup
 --
 -- >>> import qualified Prelude
