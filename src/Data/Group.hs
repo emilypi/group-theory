@@ -1,5 +1,6 @@
 {-# language BangPatterns #-}
 {-# language FlexibleInstances #-}
+{-# language MultiWayIf #-}
 {-# language PatternSynonyms #-}
 {-# language Safe #-}
 {-# language ViewPatterns #-}
@@ -34,6 +35,7 @@ module Data.Group
 import Data.Bool
 import Data.Functor.Const
 import Data.Functor.Identity
+import Data.Semigroup (stimes)
 import Data.Int
 import Data.Monoid
 import Data.Ord
@@ -63,6 +65,23 @@ class Monoid a => Group a where
   invert :: a -> a
   invert a = mempty `minus` a
   {-# inline invert #-}
+
+  -- | Similar to 'stimes' from 'Data.Semigroup', but handles
+  -- negative numbers by using 'invert'.
+  --
+  -- === __Examples:__
+  --
+  -- >>> getSum $ gtimes 2 (Sum 3)
+  -- 6
+  -- >>> getSum $ gtimes (-3) (Sum 3)
+  -- -9
+  gtimes :: (Integral n) => n -> a -> a
+  gtimes n a =
+      let n' = toInteger n
+      in if | n' == 0   -> mempty
+            | n' > 0    -> stimes n a
+            | otherwise -> invert $ stimes n (invert a)
+  {-# inline gtimes #-}
 
   minus :: a -> a -> a
   minus a b = a <> invert b
