@@ -1,13 +1,28 @@
 {-# language RankNTypes #-}
+{-# language Safe #-}
+-- |
+-- Module       : Data.Group
+-- Copyright    : (c) 2020 Reed Mullanix
+-- License      : BSD-style
+--
+-- Maintainer   : Reed Mullanix <reedmullanix@gmail.com>,
+--                Emily Pillmore <emilypi@cohomolo.gy>
+--
+-- Stability    : stable
+-- Portability  : non-portable
+--
+-- This module provides definitions for Church-encoded
+-- 'FreeGroup's, 'FreeAbelianGroup's, along with useful combinators.
+--
 module Data.Group.Free.Church where
 
 import Control.Applicative
 import Control.Monad
 
-import Data.Foldable
 import Data.Group
 import Data.Group.Free
 import qualified Data.Map.Strict as Map
+import Data.Functor.Compose
 
 -- FIXME: Good name pls
 newtype FG a = FG { unFG :: forall g. (Group g) => (a -> g) -> g }
@@ -22,7 +37,7 @@ instance Group (FG a) where
     invert (FG g) = FG $ \k -> invert $ g k
 
 instance Functor FG where
-    fmap f (FG fa) = FG $ \k -> fa (\a -> k (f a))
+    fmap f (FG fa) = FG $ \k -> fa (k . f)
 
 instance Applicative FG where
     pure a = FG $ \k -> k a
@@ -36,18 +51,25 @@ instance Alternative FG where
     empty = mempty
     (<|>) = (<>)
 
+-- | Interpret a Church-encoded free group as a concrete 'FreeGroup'.
+--
 interpretFG :: Group g => FG g -> g
 interpretFG (FG fg) = fg id
 
+-- | Convert a Church-encoded free group to a concrete 'FreeGroup'.
+--
 reifyFG :: FG a -> FreeGroup a
 reifyFG fg = interpretFG $ fmap pure fg
 
+-- | Convert a concrete 'FreeGroup' to a Church-encoded free group.
+--
 reflectFG :: FreeGroup a -> FG a
-reflectFG (FreeGroup fg) = FG $ \k -> foldMap k fg
+reflectFG (FreeGroup fg) = FG $ \k -> foldMap k (Compose fg)
 
-    
--- present :: (Group g) => FG g -> (FreeGroup g -> g) -> g
--- present (FG fg) p = _ $ fmap p fg
+-- | Present a 'Group' as a 'FreeGroup' modulo relations.
+--
+present :: (Group g) => FG g -> (FreeGroup g -> g) -> g
+present fg p = p $ reifyFG fg
 
 ----------------------------------------
 -- Free Abelian Groups
@@ -81,11 +103,17 @@ instance Alternative FA where
     empty = mempty
     (<|>) = (<>)
 
+-- | Interpret a Church-encoded free abelian group as a concrete 'FreeAbelianGroup'.
+--
 interpretFA :: Group g => FA g -> g
 interpretFA (FA fa) = fa (flip gtimes)
 
+-- | Convert a Church-encoded free abelian group to a concrete 'FreeAbelianGroup'.
+--
 reifyFA :: (Ord a) => FA a -> FreeAbelian a
 reifyFA fa = interpretFA $ fmap singleton fa
 
+-- | Convert a concrete 'FreeAbelianGroup' to a Church-encoded free abelian group.
+--
 reflectFA :: (Ord a) => FreeAbelian a -> FA a
 reflectFA (FreeAbelian fa) = FA $ \k -> Map.foldMapWithKey k fa

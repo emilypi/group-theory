@@ -1,14 +1,18 @@
+{-# language Safe #-}
 -- |
 -- Module       : Data.Group
 -- Copyright    : (c) 2020 Reed Mullanix
 -- License      : BSD-style
 --
--- Maintainer   : Reed Mullanix <reedmullanix@gmail.com>
+-- Maintainer   : Reed Mullanix <reedmullanix@gmail.com>,
+--                Emily Pillmore <emilypi@cohomolo.gy>
+--
 -- Stability    : stable
 -- Portability  : non-portable
 --
--- This module defines free groups, as well as
--- along some useful functions.
+-- This module provides definitions for 'FreeGroup's, 'FreeAbelianGroup's,
+-- and 'GroupFoldable', along with useful combinators.
+--
 module Data.Group.Free
   ( FreeGroup(..)
   , GroupFoldable(..)
@@ -17,6 +21,7 @@ module Data.Group.Free
   , interpret'
   , FreeAbelian(..)
   , abMap
+  , abJoin
   , singleton
   , abInterpret
   ) where
@@ -34,7 +39,9 @@ import Data.Group
 class GroupFoldable t where
     gold :: (Group g) => t g -> g
     gold = goldMap id
+
     goldMap :: (Group g) => (a -> g) -> t a -> g
+
     toFreeGroup :: t a -> FreeGroup a
     -- goldr :: (a -> Iso a a) -> b -> t a -> a
     {-# minimal goldMap | toFreeGroup #-}
@@ -45,6 +52,7 @@ class GroupFoldable t where
 --
 -- __Note:__ This does not perform simplification upon multiplication or construction.
 -- To do this, one should use 'simplify'.
+--
 newtype FreeGroup a = FreeGroup { unFreeGroup :: [Either a a] }
     deriving (Show, Eq, Ord)
 
@@ -118,7 +126,7 @@ instance (Ord a) => Group (FreeAbelian a) where
     invert (FreeAbelian g) = FreeAbelian $ fmap negate g
 
 -- NOTE: We can't implement Functor/Applicative/Monad here
--- due to the Ord constraint. C'est La Vide!
+-- due to the Ord constraint. C'est La Vie!
 
 abMap :: (Ord b) => (a -> b) -> FreeAbelian a -> FreeAbelian b
 abMap f (FreeAbelian g) = FreeAbelian $ Map.mapKeys f g

@@ -273,7 +273,7 @@ conjugate a b = (b <> a) `minus` b
 -- as in the case of @All False@, or finite, as in the
 -- case of @All True@.
 --
-data Order = Infinite | Finite {-# unpack #-} !Natural
+data Order = Infinite | Finite !Natural
   deriving (Eq, Show)
 
 -- | Unidirectional pattern synonym for the infinite order of a
