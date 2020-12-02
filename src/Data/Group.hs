@@ -1,7 +1,6 @@
 {-# language BangPatterns #-}
 {-# language FlexibleInstances #-}
 {-# language PatternSynonyms #-}
-{-# language RankNTypes #-}
 {-# language Safe #-}
 {-# language ViewPatterns #-}
 -- |
