@@ -55,6 +55,7 @@ import qualified Prelude
 -- >>> import Data.Monoid
 -- >>> import Data.Semigroup
 -- >>> :set -XTypeApplications
+-- >>> :set -XFlexibleContexts
 
 infixr 6 ><
 
@@ -71,16 +72,16 @@ class Monoid a => Group a where
   --
   -- === __Examples:__
   --
-  -- >>> getSum $ gtimes 2 (Sum 3)
-  -- 6
-  -- >>> getSum $ gtimes (-3) (Sum 3)
-  -- -9
+  -- >>> gtimes 2 (Sum 3)
+  -- Sum {getSum = 6}
+  -- >>> gtimes (-3) (Sum 3)
+  -- Sum {getSum = -9}
+  --
   gtimes :: (Integral n) => n -> a -> a
-  gtimes n a =
-      let n' = toInteger n
-      in if | n' == 0   -> mempty
-            | n' > 0    -> stimes n a
-            | otherwise -> invert $ stimes n (invert a)
+  gtimes n a
+    | n == 0    = mempty
+    | n > 0     = stimes n a
+    | otherwise = stimes (abs n) (invert a)
   {-# inline gtimes #-}
 
   minus :: a -> a -> a
