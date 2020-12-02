@@ -2,6 +2,7 @@
 {-# language FlexibleInstances #-}
 {-# language PatternSynonyms #-}
 {-# language Safe #-}
+{-# language TypeOperators #-}
 {-# language ViewPatterns #-}
 -- |
 -- Module       : Data.Group
@@ -47,6 +48,8 @@ import Data.Word
 
 import Numeric.Natural
 
+import GHC.Generics
+
 import Prelude hiding (negate, exponent)
 import qualified Prelude
 
@@ -81,8 +84,8 @@ class Monoid a => Group a where
   --
   gtimes :: (Integral n) => n -> a -> a
   gtimes n a
-    | n == 0    = mempty
-    | n > 0     = stimes n a
+    | n == 0 = mempty
+    | n > 0 = stimes n a
     | otherwise = stimes (abs n) (invert a)
   {-# inline gtimes #-}
 
@@ -248,6 +251,12 @@ instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) wher
   invert ~(a,b,c,d,e) = (invert a, invert b, invert c, invert d, invert e)
   {-# inline invert #-}
 
+instance (Group (f a), Group (g a)) => Group ((f :*: g) a) where
+  invert (f :*: g) = invert f :*: invert g
+
+instance Group (f (g a)) => Group ((f :.: g) a) where
+  invert (Comp1 fg) = invert (Comp1 fg)
+
 -- -------------------------------------------------------------------- --
 -- Group combinators
 
@@ -288,13 +297,13 @@ data Order = Infinite | Finite !Natural
   deriving (Eq, Show)
 
 -- | Unidirectional pattern synonym for the infinite order of a
--- group element
+-- group element.
 --
 pattern Infinity :: (Eq g, Group g) => () => g
 pattern Infinity <- (order -> Infinite)
 
 -- | Unidirectional pattern synonym for the finite order of a
--- group elementd
+-- group element.
 --
 pattern Finitary :: (Eq g, Group g) => () => Natural -> g
 pattern Finitary n <- (order -> Finite n)
@@ -367,6 +376,9 @@ instance (AbelianGroup a, AbelianGroup b) => AbelianGroup (a,b)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c) => AbelianGroup (a,b,c)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d) => AbelianGroup (a,b,c,d)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d, AbelianGroup e) => AbelianGroup (a,b,c,d,e)
+
+instance (AbelianGroup (f a), AbelianGroup (g a)) => AbelianGroup ((f :*: g) a)
+instance AbelianGroup (f (g a)) => AbelianGroup ((f :.: g) a)
 
 -- -------------------------------------------------------------------- --
 -- Group endomorphisms

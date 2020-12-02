@@ -56,7 +56,6 @@ class GroupFoldable t where
   toFG :: t a -> FG a
   toFG t = FG $ \k -> goldMap k t
   {-# inline toFG #-}
-  {-# minimal goldMap | toFG #-}
 
   -- | Execute a group fold on a 'GroupFoldable' container.
   --
@@ -83,7 +82,8 @@ class GroupFoldable t where
     -> (g -> g, g -> g)
   goldr f = bimap appGroupEndo appGroupEndo
     . goldMap (bimap GroupEndo GroupEndo . f)
-
+  {-# inline goldr #-}
+  {-# minimal goldMap | toFG #-}
 
 instance GroupFoldable FG where
   toFG = id
