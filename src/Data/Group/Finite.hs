@@ -1,5 +1,3 @@
-{-# language BangPatterns #-}
-{-# language DefaultSignatures #-}
 {-# language FlexibleInstances #-}
 {-# language Safe #-}
 -- |
@@ -7,7 +5,9 @@
 -- Copyright    : (c) 2020 Emily Pillmore
 -- License      : BSD-style
 --
--- Maintainer   : Emily Pillmore <emilypi@cohomolo.gy>
+-- Maintainer   : Emily Pillmore <emilypi@cohomolo.gy>,
+--                Reed Mullanix <reedmullanix@gmail.com>
+
 -- Stability    : stable
 -- Portability  : non-portable
 --
@@ -17,6 +17,8 @@
 module Data.Group.Finite
 ( -- * Finite groups
   FiniteGroup
+  -- ** Finite group combinators
+, safeOrder
   -- * Finite abelian groups
 , FiniteAbelianGroup
 ) where
@@ -71,6 +73,28 @@ instance FiniteGroup (Sum Word8)
 instance FiniteGroup (Sum Word16)
 instance FiniteGroup (Sum Word32)
 instance FiniteGroup (Sum Word64)
+
+-- -------------------------------------------------------------------- --
+-- Finite group combinators
+
+-- | A safe version of 'order' for 'FiniteGroup's.
+--
+-- This is gauranteed to terminate with either @Infinite@ or @Finite@.
+--
+-- === __Examples__:
+--
+-- >>> order @(Sum Word8) 3
+-- Finite 255
+--
+-- >>> order (Any False)
+-- Finite 1
+--
+-- >>> order (All False)
+-- Infinite
+--
+safeOrder :: (Eq g, FiniteGroup g) => g -> Order
+safeOrder = order
+{-# inline safeOrder #-}
 
 -- -------------------------------------------------------------------- --
 -- Finite abelian groups

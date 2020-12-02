@@ -8,7 +8,8 @@
 -- Copyright    : (c) 2020 Emily Pillmore
 -- License      : BSD-style
 --
--- Maintainer   : Emily Pillmore <emilypi@cohomolo.gy>
+-- Maintainer   : Emily Pillmore <emilypi@cohomolo.gy>,
+--                Reed Mullanix <reedmullanix@gmail.com>
 -- Stability    : stable
 -- Portability  : non-portable
 --
@@ -21,14 +22,16 @@ module Data.Group
   -- ** Group combinators
 , (><)
 , conjugate
+, order
   -- ** Group order
 , Order(..)
 , pattern Infinity
 , pattern Finitary
   -- * Abelian groups
 , AbelianGroup
+  -- * Group endomorphisms
+, GroupEndo(..)
 ) where
-
 
 
 import Data.Bool
@@ -364,3 +367,25 @@ instance (AbelianGroup a, AbelianGroup b) => AbelianGroup (a,b)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c) => AbelianGroup (a,b,c)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d) => AbelianGroup (a,b,c,d)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d, AbelianGroup e) => AbelianGroup (a,b,c,d,e)
+
+-- -------------------------------------------------------------------- --
+-- Group endomorphisms
+
+-- | A group homomorphism from the group to itself.
+--
+-- 'GroupEndo' forms a near-ring for any group, since it is not necessarily
+-- additive. When @g@ is an 'AbelianGroup', 'GroupEndo' forms a ring.
+--
+newtype GroupEndo g = GroupEndo
+  { appGroupEndo :: g -> g }
+
+instance Semigroup (GroupEndo g) where
+  GroupEndo g <> GroupEndo g' = GroupEndo (g' . g)
+
+instance Monoid (GroupEndo g) where
+  mempty = GroupEndo id
+
+instance Group g => Group (GroupEndo g) where
+  invert = GroupEndo . (invert .) . appGroupEndo
+
+instance AbelianGroup g => AbelianGroup (GroupEndo g)

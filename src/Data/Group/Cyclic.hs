@@ -6,7 +6,8 @@
 -- Copyright    : (c) 2020 Emily Pillmore
 -- License      : BSD-style
 --
--- Maintainer   : Emily Pillmore <emilypi@cohomolo.gy>
+-- Maintainer   : Emily Pillmore <emilypi@cohomolo.gy>,
+--                Reed Mullanix <reedmullanix@gmail.com>
 -- Stability    : stable
 -- Portability  : non-portable
 --
