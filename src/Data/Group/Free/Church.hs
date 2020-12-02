@@ -14,7 +14,21 @@
 -- This module provides definitions for Church-encoded
 -- 'FreeGroup's, 'FreeAbelianGroup's, along with useful combinators.
 --
-module Data.Group.Free.Church where
+module Data.Group.Free.Church
+( -- * Church-encoded free groups
+  FG(..)
+  -- ** Church-encoded free group combinators
+, interpretFG
+, reifyFG
+, reflectFG
+, present
+  -- * Church-encoded free abelian groups
+, FA(..)
+  -- ** Church-encoded free abelian group combinators
+, interpretFA
+, reifyFA
+, reflectFA
+) where
 
 import Control.Applicative
 import Control.Monad
@@ -24,14 +38,14 @@ import Data.Group.Free
 import qualified Data.Map.Strict as Map
 import Data.Functor.Compose
 
--- FIXME: Good name pls
-newtype FG a = FG { unFG :: forall g. (Group g) => (a -> g) -> g }
+
+newtype FG a = FG { runFG :: forall g. (Group g) => (a -> g) -> g }
 
 instance Semigroup (FG a) where
     (FG g) <> (FG g') = FG $ \k -> g k <> g' k
 
 instance Monoid (FG a) where
-    mempty = FG $ \_ -> mempty
+    mempty = FG $ const mempty
 
 instance Group (FG a) where
     invert (FG g) = FG $ \k -> invert $ g k
@@ -45,7 +59,7 @@ instance Applicative FG where
 
 instance Monad FG where
     return = pure
-    (FG fg) >>= f = FG $ \k -> fg (\a -> (unFG $ f a) k)
+    (FG fg) >>= f = FG $ \k -> fg (\a -> (runFG $ f a) k)
 
 instance Alternative FG where
     empty = mempty
@@ -55,41 +69,45 @@ instance Alternative FG where
 --
 interpretFG :: Group g => FG g -> g
 interpretFG (FG fg) = fg id
+{-# inline interpretFG #-}
 
 -- | Convert a Church-encoded free group to a concrete 'FreeGroup'.
 --
 reifyFG :: FG a -> FreeGroup a
 reifyFG fg = interpretFG $ fmap pure fg
+{-# inline reifyFG #-}
 
 -- | Convert a concrete 'FreeGroup' to a Church-encoded free group.
 --
 reflectFG :: FreeGroup a -> FG a
 reflectFG (FreeGroup fg) = FG $ \k -> foldMap k (Compose fg)
+{-# inline reflectFG #-}
 
 -- | Present a 'Group' as a 'FreeGroup' modulo relations.
 --
-present :: (Group g) => FG g -> (FreeGroup g -> g) -> g
-present fg p = p $ reifyFG fg
+present :: (Group g) => (FreeGroup g -> g) -> FG g -> g
+present p = p . reifyFG
+{-# inline present #-}
 
 ----------------------------------------
 -- Free Abelian Groups
 
 -- FIXME: Good name pls
 -- :)
-newtype FA a = FA { unFA :: forall g. (Group g) => (a -> Int -> g) -> g }
+newtype FA a = FA { runFA :: forall g. (Group g) => (a -> Int -> g) -> g }
 
 instance Semigroup (FA a) where
     (FA g) <> (FA g') = FA $ \k -> g k <> g' k
 
 instance Monoid (FA a) where
-    mempty = FA $ \_ -> mempty
+    mempty = FA $ const mempty
 
 instance Group (FA a) where
     invert (FA g) = FA $ \k -> invert $ g k
 
 -- Contravariant pls!!
 instance Functor FA where
-    fmap f (FA fa) = FA $ \k -> fa (\a n -> k (f a) n)
+    fmap f (FA fa) = FA $ \k -> fa (k . f)
 
 instance Applicative FA where
     pure a = FA $ \k -> k a 1
@@ -97,7 +115,7 @@ instance Applicative FA where
 
 instance Monad FA where
     return = pure
-    (FA fa) >>= f = FA $ \k -> fa (\a n -> gtimes n $ (unFA $ f a) k)
+    (FA fa) >>= f = FA $ \k -> fa (\a n -> gtimes n $ (runFA $ f a) k)
 
 instance Alternative FA where
     empty = mempty
@@ -107,13 +125,16 @@ instance Alternative FA where
 --
 interpretFA :: Group g => FA g -> g
 interpretFA (FA fa) = fa (flip gtimes)
+{-# inline interpretFA #-}
 
 -- | Convert a Church-encoded free abelian group to a concrete 'FreeAbelianGroup'.
 --
 reifyFA :: (Ord a) => FA a -> FreeAbelianGroup a
-reifyFA fa = interpretFA $ fmap singleton fa
+reifyFA = interpretFA . fmap singleton
+{-# inline reifyFA #-}
 
 -- | Convert a concrete 'FreeAbelianGroup' to a Church-encoded free abelian group.
 --
 reflectFA :: (Ord a) => FreeAbelianGroup a -> FA a
 reflectFA (FreeAbelianGroup fa) = FA $ \k -> Map.foldMapWithKey k fa
+{-# inline reflectFA #-}

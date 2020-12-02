@@ -1,6 +1,7 @@
 {-# language BangPatterns #-}
 {-# language FlexibleInstances #-}
 {-# language PatternSynonyms #-}
+{-# language RankNTypes #-}
 {-# language Safe #-}
 {-# language ViewPatterns #-}
 -- |
@@ -27,8 +28,9 @@ module Data.Group
 , pattern Finitary
   -- * Abelian groups
 , AbelianGroup
+  -- * Group endomorphisms
+, GroupEndo(..)
 ) where
-
 
 
 import Data.Bool
@@ -364,3 +366,14 @@ instance (AbelianGroup a, AbelianGroup b) => AbelianGroup (a,b)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c) => AbelianGroup (a,b,c)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d) => AbelianGroup (a,b,c,d)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d, AbelianGroup e) => AbelianGroup (a,b,c,d,e)
+
+-- -------------------------------------------------------------------- --
+-- Group endomorphisms
+
+-- | A group homomorphism from the group to itself.
+--
+-- 'GroupEndo' forms a near-ring for any group, since it is not necessarily
+-- additive. When @g@ is an 'AbelianGroup', 'GroupEndo' forms a ring.
+--
+newtype GroupEndo = GroupEndo
+  { appGroupEndo :: forall g. Group g => g -> g }
