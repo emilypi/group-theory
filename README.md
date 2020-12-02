@@ -12,4 +12,4 @@ Contributions and bug reports are welcome!
 
 Co-maintained by Emily Pillmore (@topos) and Reed Mullanix (@totbwf). Please feel free to contact either myself, or Reed through github or on the #haskell IRC channel on irc.freenode.net.
 
-- Emily
+\- Emily
