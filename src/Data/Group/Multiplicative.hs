@@ -131,7 +131,7 @@ instance MultiplicativeGroup a => MultiplicativeGroup (Proxy a)
 -- Product {getProduct = 27 % 1}
 --
 power :: (Integral n, MultiplicativeGroup g) => g -> n -> g
-power a n = stimes n a
+power a n = gtimes n a
 {-# inline power #-}
 
 -- -------------------------------------------------------------------- --

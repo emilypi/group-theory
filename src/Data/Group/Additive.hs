@@ -134,7 +134,7 @@ instance AdditiveGroup Ordering
 -- Sum {getSum = 6}
 --
 copower :: (Integral n, AdditiveGroup g) => n -> g -> g
-copower = stimes
+copower = gtimes
 {-# inline copower #-}
 
 -- -------------------------------------------------------------------- --

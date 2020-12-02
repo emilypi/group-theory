@@ -37,6 +37,9 @@ library
     Data.Group.Additive
     Data.Group.Cyclic
     Data.Group.Finite
+    Data.Group.Foldable
+    Data.Group.Free
+    Data.Group.Free.Church
     Data.Group.Multiplicative
     Data.Group.Permutation
     Data.Group.Simple
@@ -45,6 +48,7 @@ library
     Data.Group.Internal.Singletons
 
   build-depends:    base >=4.11 && <5
+                  , containers >= 0.5 && < 0.7
                   , reflection
 
   hs-source-dirs:   src
