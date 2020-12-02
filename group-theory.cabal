@@ -37,6 +37,7 @@ library
     Data.Group.Additive
     Data.Group.Cyclic
     Data.Group.Finite
+    Data.Group.Foldable
     Data.Group.Free
     Data.Group.Free.Church
     Data.Group.Multiplicative

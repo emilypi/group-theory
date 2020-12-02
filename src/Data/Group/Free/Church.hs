@@ -110,10 +110,10 @@ interpretFA (FA fa) = fa (flip gtimes)
 
 -- | Convert a Church-encoded free abelian group to a concrete 'FreeAbelianGroup'.
 --
-reifyFA :: (Ord a) => FA a -> FreeAbelian a
+reifyFA :: (Ord a) => FA a -> FreeAbelianGroup a
 reifyFA fa = interpretFA $ fmap singleton fa
 
 -- | Convert a concrete 'FreeAbelianGroup' to a Church-encoded free abelian group.
 --
-reflectFA :: (Ord a) => FreeAbelian a -> FA a
-reflectFA (FreeAbelian fa) = FA $ \k -> Map.foldMapWithKey k fa
+reflectFA :: (Ord a) => FreeAbelianGroup a -> FA a
+reflectFA (FreeAbelianGroup fa) = FA $ \k -> Map.foldMapWithKey k fa

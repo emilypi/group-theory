@@ -14,17 +14,20 @@
 -- and 'GroupFoldable', along with useful combinators.
 --
 module Data.Group.Free
-  ( FreeGroup(..)
-  , GroupFoldable(..)
-  , simplify
-  , interpret
-  , interpret'
-  , FreeAbelian(..)
-  , abMap
-  , abJoin
-  , singleton
-  , abInterpret
-  ) where
+( -- * Free groups
+  FreeGroup(..)
+  -- ** Free group combinators
+, simplify
+, interpret
+, interpret'
+  -- * Free abelian groups
+, FreeAbelianGroup(..)
+  -- ** Free abelian group combinators
+, abmap
+, abjoin
+, singleton
+, abInterpret
+) where
 
 import Control.Applicative
 import Control.Monad
@@ -36,17 +39,8 @@ import qualified Data.Map.Strict as Map
 import Data.Group
 
 
-class GroupFoldable t where
-    gold :: (Group g) => t g -> g
-    gold = goldMap id
-
-    goldMap :: (Group g) => (a -> g) -> t a -> g
-
-    toFreeGroup :: t a -> FreeGroup a
-    -- goldr :: (a -> Iso a a) -> b -> t a -> a
-    {-# minimal goldMap | toFreeGroup #-}
-
 -- | A representation of a free group over an alphabet @a@.
+--
 -- The intuition here is that @Left a@ represents a "negative" @a@,
 -- whereas @Right a@ represents "positive" @a@.
 --
@@ -86,12 +80,14 @@ instance Monad FreeGroup where
 instance Alternative FreeGroup where
     empty = mempty
     (<|>) = (<>)
+
 -- | /O(n)/ Simplifies a word in a free group.
 --
 -- === __Examples:__
 --
 -- >>> simplify $ FreeGroup $ [Right 'a', Left 'b', Right 'c', Left 'c', Right 'b', Right 'a']
 -- FreeGroup {unFreeGroup = [Right 'a',Right 'a']}
+--
 simplify :: (Eq a) => FreeGroup a -> FreeGroup a
 simplify (FreeGroup g) = FreeGroup $ foldr go [] g
     where
@@ -100,6 +96,7 @@ simplify (FreeGroup g) = FreeGroup $ foldr go [] g
       go a as = a:as
 
 -- | /O(n)/ Interpret a word in a free group over some group @g@ as an element in a group @g@.
+--
 interpret :: (Group g) => FreeGroup g -> g
 interpret (FreeGroup g) = foldr go mempty g
     where
@@ -107,37 +104,52 @@ interpret (FreeGroup g) = foldr go mempty g
       go (Right a) acc = a <> acc
 
 -- | /O(n)/ Strict variant of 'interpret'.
+--
 interpret' :: (Group g) => FreeGroup g -> g
 interpret' (FreeGroup g) = foldl' go mempty g
     where
       go acc (Left a) = acc <> invert a
       go acc (Right a) = acc <> a
 
-newtype FreeAbelian a = FreeAbelian { unFreeAbelian :: Map a Int }
+-- | A representation of a free abelian group over an alphabet @a@.
+--
+-- The intuition here is group elements correspond with their positive
+-- or negative multiplicities, and as such are simplified by construction.
+--
+newtype FreeAbelianGroup a = FreeAbelianGroup { runFreeAbelian :: Map a Int }
     deriving (Show, Eq, Ord)
 
-instance (Ord a) => Semigroup (FreeAbelian a) where
-    (FreeAbelian g) <> (FreeAbelian g') = FreeAbelian $ Map.unionWith (+) g g'
+instance (Ord a) => Semigroup (FreeAbelianGroup a) where
+    (FreeAbelianGroup g) <> (FreeAbelianGroup g') =
+      FreeAbelianGroup $ Map.unionWith (+) g g'
 
-instance (Ord a) => Monoid (FreeAbelian a) where
-    mempty = FreeAbelian mempty
+instance (Ord a) => Monoid (FreeAbelianGroup a) where
+    mempty = FreeAbelianGroup mempty
 
-instance (Ord a) => Group (FreeAbelian a) where
-    invert (FreeAbelian g) = FreeAbelian $ fmap negate g
+instance (Ord a) => Group (FreeAbelianGroup a) where
+    invert (FreeAbelianGroup g) = FreeAbelianGroup $ fmap negate g
 
 -- NOTE: We can't implement Functor/Applicative/Monad here
 -- due to the Ord constraint. C'est La Vie!
 
-abMap :: (Ord b) => (a -> b) -> FreeAbelian a -> FreeAbelian b
-abMap f (FreeAbelian g) = FreeAbelian $ Map.mapKeys f g
+-- | Functorial 'fmap' for a 'FreeAbelian' group.
+--
+abmap :: (Ord b) => (a -> b) -> FreeAbelianGroup a -> FreeAbelianGroup b
+abmap f (FreeAbelianGroup g) = FreeAbelianGroup $ Map.mapKeys f g
 
-singleton :: a -> FreeAbelian a
-singleton a = FreeAbelian $ Map.singleton a 1
+-- | Lift a singular value into a 'FreeAbelianGroup'. Analogous to 'pure'.
+--
+singleton :: a -> FreeAbelianGroup a
+singleton a = FreeAbelianGroup $ Map.singleton a 1
 
-abJoin :: (Ord a) => FreeAbelian (FreeAbelian a) -> FreeAbelian a
-abJoin (FreeAbelian g) = FreeAbelian $ Map.foldMapWithKey go g
+-- | Monadic 'join' for a 'FreeAbelian' group.
+--
+abjoin :: (Ord a) => FreeAbelianGroup (FreeAbelianGroup a) -> FreeAbelianGroup a
+abjoin (FreeAbelianGroup g) = FreeAbelianGroup $ Map.foldMapWithKey go g
     where
-      go (FreeAbelian g') n = fmap (*n) g'
+      go (FreeAbelianGroup g') n = fmap (*n) g'
 
-abInterpret :: (Group g) => FreeAbelian g -> g
-abInterpret (FreeAbelian g) = Map.foldMapWithKey (flip gtimes) g
+-- | Interpret a free group as a word in the underlying group @g@.
+--
+abInterpret :: (Group g) => FreeAbelianGroup g -> g
+abInterpret (FreeAbelianGroup g) = Map.foldMapWithKey (flip gtimes) g
