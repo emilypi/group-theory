@@ -2,7 +2,7 @@
 {-# language Safe #-}
 -- |
 -- Module       : Data.Group
--- Copyright    : (c) 2020 Reed Mullanix
+-- Copyright    : (c) 2020 Reed Mullanix, Emily Pillmore
 -- License      : BSD-style
 --
 -- Maintainer   : Reed Mullanix <reedmullanix@gmail.com>,
@@ -25,6 +25,7 @@ module Data.Group.Free.Church
   -- * Church-encoded free abelian groups
 , FA(..)
   -- ** Church-encoded free abelian group combinators
+, forgetFA
 , interpretFA
 , reifyFA
 , reflectFA
@@ -38,7 +39,13 @@ import Data.Group.Free
 import qualified Data.Map.Strict as Map
 import Data.Functor.Compose
 
-
+-- | The Church-encoding of a 'FreeGroup'.
+--
+-- This datatype represents the free group on some @a@-valued
+-- generators. For more information on why this encoding is preferred,
+-- see Dan Doel's <http://comonad.com/reader/2015/free-monoids-in-haskell/ article> in
+-- the Comonad Reader.
+--
 newtype FG a = FG { runFG :: forall g. (Group g) => (a -> g) -> g }
 
 instance Semigroup (FG a) where
@@ -85,15 +92,18 @@ reflectFG (FreeGroup fg) = FG $ \k -> foldMap k (Compose fg)
 
 -- | Present a 'Group' as a 'FreeGroup' modulo relations.
 --
-present :: (Group g) => (FreeGroup g -> g) -> FG g -> g
+present :: Group g => (FreeGroup g -> g) -> FG g -> g
 present p = p . reifyFG
 {-# inline present #-}
 
 ----------------------------------------
 -- Free Abelian Groups
 
--- FIXME: Good name pls
--- :)
+-- | The Church-encoding of a 'FreeAbelianGroup'.
+--
+-- This datatype represents the free group on some @a@-valued
+-- generators, along with their exponents in the group.
+--
 newtype FA a = FA { runFA :: forall g. (Group g) => (a -> Int -> g) -> g }
 
 instance Semigroup (FA a) where
@@ -105,7 +115,6 @@ instance Monoid (FA a) where
 instance Group (FA a) where
     invert (FA g) = FA $ \k -> invert $ g k
 
--- Contravariant pls!!
 instance Functor FA where
     fmap f (FA fa) = FA $ \k -> fa (k . f)
 
@@ -129,12 +138,19 @@ interpretFA (FA fa) = fa (flip gtimes)
 
 -- | Convert a Church-encoded free abelian group to a concrete 'FreeAbelianGroup'.
 --
-reifyFA :: (Ord a) => FA a -> FreeAbelianGroup a
+reifyFA :: Ord a => FA a -> FreeAbelianGroup a
 reifyFA = interpretFA . fmap singleton
 {-# inline reifyFA #-}
 
 -- | Convert a concrete 'FreeAbelianGroup' to a Church-encoded free abelian group.
 --
-reflectFA :: (Ord a) => FreeAbelianGroup a -> FA a
+reflectFA :: Ord a => FreeAbelianGroup a -> FA a
 reflectFA (FreeAbelianGroup fa) = FA $ \k -> Map.foldMapWithKey k fa
 {-# inline reflectFA #-}
+
+-- | Forget the commutative structure of a Church-encoded free abelian group,
+-- turning it into a standard free group.
+--
+forgetFA :: Group a => FA a -> FG a
+forgetFA fa = FG $ \k -> k $ interpretFA fa
+{-# inline forgetFA #-}
