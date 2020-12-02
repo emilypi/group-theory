@@ -1,6 +1,5 @@
 {-# language BangPatterns #-}
 {-# language FlexibleInstances #-}
-{-# language MultiWayIf #-}
 {-# language PatternSynonyms #-}
 {-# language Safe #-}
 {-# language ViewPatterns #-}
@@ -84,10 +83,18 @@ class Monoid a => Group a where
     | otherwise = stimes (abs n) (invert a)
   {-# inline gtimes #-}
 
+  -- | 'Group' subtraction.
+  --
+  -- This function denotes principled 'Group' subtraction, where
+  -- @a `minus` b@ translates into @a <> (invert b)@. This is because
+  -- subtraction as an operator is non-associative, but the operation
+  -- described in terms of addition and inversion is.
+  --
   minus :: a -> a -> a
   minus a b = a <> invert b
   {-# inline minus #-}
   {-# minimal invert | minus #-}
+
 
 instance Group () where
   invert = id
