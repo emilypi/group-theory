@@ -1,8 +1,9 @@
+{-# language CPP #-}
 {-# language FlexibleInstances #-}
-{-# language PatternSynonyms #-}
 {-# language Safe #-}
+#if MIN_VERSION_base(4,12,0)
 {-# language TypeOperators #-}
-{-# language ViewPatterns #-}
+#endif
 -- |
 -- Module       : Data.Group
 -- Copyright    : (c) 2020 Reed Mullanix, Emily Pillmore
@@ -31,8 +32,9 @@ import Data.Group.Free.Church
 import Data.Group.Permutation
 import Data.Monoid
 
+#if MIN_VERSION_base(4,12,0)
 import GHC.Generics
-
+#endif
 
 -- | The class of data structures that can be groupoidally folded.
 --
@@ -107,6 +109,7 @@ instance GroupFoldable (Const a) where
 instance GroupFoldable Identity where
   goldMap f = f . runIdentity
 
+#if MIN_VERSION_base(4,12,0)
 instance (GroupFoldable f, GroupFoldable g) => GroupFoldable (f :*: g) where
   goldMap f (a :*: b) = goldMap f a <> goldMap f b
 
@@ -116,3 +119,4 @@ instance (GroupFoldable f, GroupFoldable g) => GroupFoldable (f :+: g) where
 
 instance (GroupFoldable f, GroupFoldable g) => GroupFoldable (f :.: g) where
   goldMap f = goldMap (goldMap f) . unComp1
+#endif
