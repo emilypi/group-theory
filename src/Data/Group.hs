@@ -1,5 +1,6 @@
 {-# language BangPatterns #-}
 {-# language CPP #-}
+{-# language DerivingStrategies #-}
 {-# language FlexibleInstances #-}
 {-# language PatternSynonyms #-}
 {-# language Safe #-}
@@ -23,15 +24,22 @@
 module Data.Group
 ( -- * Groups
   Group(..)
-  -- ** Group combinators
+  -- * Group combinators
 , (><)
+  -- ** Conjugation
 , conjugate
 , unconjugate
-, order
-  -- ** Group order
+, pattern Conjugate
+  -- ** Order
 , Order(..)
-, pattern Infinity
+, pattern Infinitary
 , pattern Finitary
+, order
+  -- ** Abelianization
+, Abelianizer(..)
+, abelianize
+, pattern Commutated
+, pattern Quotiented
   -- * Abelian groups
 , AbelianGroup
 ) where
@@ -398,6 +406,16 @@ conjugate g a = (g <> a) `minus` g
 unconjugate :: Group a => a -> a -> a
 unconjugate g a = invert g <> a <> g
 
+-- | Bidirectional pattern for conjugation by a group element
+--
+-- __Note:__ When the underlying 'Group' is abelian, this
+-- pattern is the identity.
+--
+pattern Conjugate :: Group a => (a,a) -> (a,a)
+pattern Conjugate t <- (\(g,a) -> (g, conjugate g a) -> t) where
+  Conjugate (g,a) = (g, unconjugate g a)
+{-# complete Conjugate #-}
+
 -- -------------------------------------------------------------------- --
 -- Group order
 
@@ -413,13 +431,13 @@ data Order = Infinite | Finite !Natural
 -- | Unidirectional pattern synonym for the infinite order of a
 -- group element.
 --
-pattern Infinity :: (Eq g, Group g) => () => g
-pattern Infinity <- (order -> Infinite)
+pattern Infinitary :: (Eq g, Group g) => g
+pattern Infinitary <- (order -> Infinite)
 
 -- | Unidirectional pattern synonym for the finite order of a
 -- group element.
 --
-pattern Finitary :: (Eq g, Group g) => () => Natural -> g
+pattern Finitary :: (Eq g, Group g) => Natural -> g
 pattern Finitary n <- (order -> Finite n)
 
 -- | Calculate the exponent of a particular element in a group.
@@ -448,6 +466,85 @@ order a = go 0 a where
     | g == a, n > 0 = Infinite
     | otherwise = go (succ n) (g <> a)
 {-# inline order #-}
+
+-- -------------------------------------------------------------------- --
+-- Abelianization
+
+-- | Quotient a pair of group elements by their commutator.
+--
+-- The quotient \( G / [G,G] \) forms an abelian group, and 'Abelianizer'
+-- forms a functor from the category of groups to the category of Abelian groups.
+-- This functor is, in fact, a monad in \( Grp \) when this functor
+-- is composed with the forgetful functor \( Ab \rightarrow Grp \)
+-- "forgetting" commutativity.
+--
+data Abelianizer a = Quot | Commuted a
+  deriving stock (Eq, Show)
+
+instance Functor Abelianizer where
+  fmap _ Quot = Quot
+  fmap f (Commuted a) = Commuted (f a)
+
+instance Applicative Abelianizer where
+  pure = Commuted
+
+  Quot <*> _ = Quot
+  _ <*> Quot = Quot
+  Commuted f <*> Commuted a = Commuted (f a)
+
+instance Monad Abelianizer where
+  return = pure
+  (>>) = (*>)
+
+  Quot >>= _ = Quot
+  Commuted a >>= f = f a
+
+instance Foldable Abelianizer where
+  foldMap _ Quot = mempty
+  foldMap f (Commuted a) = f a
+
+instance Traversable Abelianizer where
+  traverse _ Quot = pure Quot
+  traverse f (Commuted a) = Commuted <$> f a
+
+instance Semigroup g => Semigroup (Abelianizer g) where
+  Quot <> t = t
+  t <> Quot = t
+  Commuted a <> Commuted b = Commuted (a <> b)
+
+instance Monoid g => Monoid (Abelianizer g) where
+  -- Normally we'd say 'Quot' but these are the same.
+  mempty = Commuted mempty
+
+instance (Eq g, Group g) => Group (Abelianizer g) where
+  invert Quot = Quot
+  invert (Commuted a)
+    | a == mempty = Quot
+    | otherwise = Commuted (invert a)
+
+-- | Quotient a pair of group elements by their commutator.
+--
+-- Ranging over the entire group, this operation constructs
+-- the the commutator sub-group of @g@.
+--
+abelianize :: (Eq g, Group g) => g -> g -> Abelianizer g
+abelianize g g'
+  | x == mempty = Quot
+  | otherwise = Commuted x
+  where
+    x = g <> g' <> invert g <> invert g'
+
+-- | A unidirectional pattern synonym for elements of a group
+-- modulo commutators which are __not__ the identity.
+--
+pattern Commutated :: (Eq g, Group g) => g -> (g,g)
+pattern Commutated x <- (uncurry abelianize -> Commuted x)
+
+-- | A unidirectional pattern synonym for elements of a group
+-- modulo commutators which are the identity.
+--
+pattern Quotiented :: (Eq g, Group g) => (g,g)
+pattern Quotiented <- (uncurry abelianize -> Quot)
 
 -- -------------------------------------------------------------------- --
 -- Abelian (commutative) groups
@@ -516,3 +613,4 @@ instance AbelianGroup (Equivalence a)
 instance AbelianGroup (Comparison a)
 instance AbelianGroup (Predicate a)
 instance AbelianGroup a => AbelianGroup (Op a b)
+instance (Eq a, AbelianGroup a) => AbelianGroup (Abelianizer a)

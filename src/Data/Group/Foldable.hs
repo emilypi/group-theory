@@ -133,6 +133,10 @@ instance (GroupFoldable f, GroupFoldable g) => GroupFoldable (f :.: g) where
   goldMap f = goldMap (goldMap f) . unComp1
 #endif
 
+instance GroupFoldable Abelianizer where
+  goldMap _ Quot = mempty
+  goldMap f (Commuted a) = f a
+
 -- -------------------------------------------------------------------- --
 -- Group foldable combinators
 
