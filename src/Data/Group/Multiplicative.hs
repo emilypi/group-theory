@@ -58,7 +58,7 @@ infixr 8 ^
 --
 -- For example, the multiplicative group of rationals \( (ℚ, 1, *) \).
 --
-class AbelianGroup g => MultiplicativeGroup g
+class Group g => MultiplicativeGroup g
 
 instance MultiplicativeGroup ()
 instance MultiplicativeGroup b => MultiplicativeGroup (a -> b)

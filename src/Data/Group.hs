@@ -1,8 +1,11 @@
 {-# language BangPatterns #-}
+{-# language CPP #-}
 {-# language FlexibleInstances #-}
 {-# language PatternSynonyms #-}
 {-# language Safe #-}
+#if MIN_VERSION_base(4,12,0)
 {-# language TypeOperators #-}
+#endif
 {-# language ViewPatterns #-}
 -- |
 -- Module       : Data.Group
@@ -48,7 +51,9 @@ import Data.Word
 
 import Numeric.Natural
 
+#if MIN_VERSION_base(4,12,0)
 import GHC.Generics
+#endif
 
 import Prelude hiding (negate, exponent)
 import qualified Prelude
@@ -251,11 +256,13 @@ instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) wher
   invert ~(a,b,c,d,e) = (invert a, invert b, invert c, invert d, invert e)
   {-# inline invert #-}
 
+#if MIN_VERSION_base(4,12,0)
 instance (Group (f a), Group (g a)) => Group ((f :*: g) a) where
   invert (f :*: g) = invert f :*: invert g
 
 instance Group (f (g a)) => Group ((f :.: g) a) where
   invert (Comp1 fg) = invert (Comp1 fg)
+#endif
 
 -- -------------------------------------------------------------------- --
 -- Group combinators
@@ -270,6 +277,9 @@ a >< b = b <> a
 -- | Conjugate an element of a group by another element.
 -- When the group is abelian, conjugation is the identity.
 --
+-- Note: the first argument is the conjugating element so that
+-- it can be fixed to produce conjugacy classes of second argument.
+--
 -- === __Examples__:
 --
 -- >>> let x = Sum (3 :: Int)
@@ -277,11 +287,11 @@ a >< b = b <> a
 -- Sum {getSum = 3}
 --
 -- >>> let x = All True
--- >>> conjugate x (All False)
+-- >>> conjugate (All False) x
 -- All {getAll = False}
 --
 conjugate :: Group a => a -> a -> a
-conjugate a b = (b <> a) `minus` b
+conjugate g a = (g <> a) `minus` g
 {-# inline conjugate #-}
 
 -- -------------------------------------------------------------------- --
@@ -377,8 +387,10 @@ instance (AbelianGroup a, AbelianGroup b, AbelianGroup c) => AbelianGroup (a,b,c
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d) => AbelianGroup (a,b,c,d)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d, AbelianGroup e) => AbelianGroup (a,b,c,d,e)
 
+#if MIN_VERSION_base(4,12,0)
 instance (AbelianGroup (f a), AbelianGroup (g a)) => AbelianGroup ((f :*: g) a)
 instance AbelianGroup (f (g a)) => AbelianGroup ((f :.: g) a)
+#endif
 
 -- -------------------------------------------------------------------- --
 -- Group endomorphisms

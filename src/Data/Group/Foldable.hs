@@ -1,6 +1,9 @@
+{-# language CPP #-}
 {-# language FlexibleInstances #-}
 {-# language Safe #-}
+#if MIN_VERSION_base(4,12,0)
 {-# language TypeOperators #-}
+#endif
 -- |
 -- Module       : Data.Group
 -- Copyright    : (c) 2020 Reed Mullanix, Emily Pillmore
@@ -21,16 +24,17 @@ module Data.Group.Foldable
 ) where
 
 
-import Data.Bifunctor
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
 import Data.Group.Free
 import Data.Group.Free.Church
+import Data.Group.Permutation
 import Data.Monoid
 
+#if MIN_VERSION_base(4,12,0)
 import GHC.Generics
-
+#endif
 
 -- | The class of data structures that can be groupoidally folded.
 --
@@ -77,11 +81,10 @@ class GroupFoldable t where
   --
   goldr
     :: Group g
-    => (a -> (g -> g, g -> g))
+    => (a -> Permutation g)
     -> t a
     -> (g -> g, g -> g)
-  goldr f = bimap appGroupEndo appGroupEndo
-    . goldMap (bimap GroupEndo GroupEndo . f)
+  goldr f = pairwise . goldMap f
   {-# inline goldr #-}
   {-# minimal goldMap | toFG #-}
 
@@ -106,6 +109,7 @@ instance GroupFoldable (Const a) where
 instance GroupFoldable Identity where
   goldMap f = f . runIdentity
 
+#if MIN_VERSION_base(4,12,0)
 instance (GroupFoldable f, GroupFoldable g) => GroupFoldable (f :*: g) where
   goldMap f (a :*: b) = goldMap f a <> goldMap f b
 
@@ -115,3 +119,4 @@ instance (GroupFoldable f, GroupFoldable g) => GroupFoldable (f :+: g) where
 
 instance (GroupFoldable f, GroupFoldable g) => GroupFoldable (f :.: g) where
   goldMap f = goldMap (goldMap f) . unComp1
+#endif
