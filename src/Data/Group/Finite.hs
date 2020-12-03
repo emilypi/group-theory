@@ -28,6 +28,7 @@ import Data.Functor.Identity
 import Data.Group
 import Data.Int
 import Data.Monoid
+import Data.Ord
 import Data.Proxy
 import Data.Word
 
@@ -73,6 +74,8 @@ instance FiniteGroup (Sum Word8)
 instance FiniteGroup (Sum Word16)
 instance FiniteGroup (Sum Word32)
 instance FiniteGroup (Sum Word64)
+instance FiniteGroup Ordering
+instance FiniteGroup a => FiniteGroup (Down a)
 
 -- -------------------------------------------------------------------- --
 -- Finite group combinators
@@ -120,3 +123,5 @@ instance (FiniteAbelianGroup a, FiniteAbelianGroup b) => FiniteAbelianGroup (a,b
 instance (FiniteAbelianGroup a, FiniteAbelianGroup b, FiniteAbelianGroup c) => FiniteAbelianGroup (a,b,c)
 instance (FiniteAbelianGroup a, FiniteAbelianGroup b, FiniteAbelianGroup c, FiniteAbelianGroup d) => FiniteAbelianGroup (a,b,c,d)
 instance (FiniteAbelianGroup a, FiniteAbelianGroup b, FiniteAbelianGroup c, FiniteAbelianGroup d, FiniteAbelianGroup e) => FiniteAbelianGroup (a,b,c,d,e)
+instance FiniteAbelianGroup Ordering
+instance FiniteAbelianGroup a => FiniteAbelianGroup (Down a)

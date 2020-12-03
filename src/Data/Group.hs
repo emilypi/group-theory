@@ -33,13 +33,12 @@ module Data.Group
 , pattern Finitary
   -- * Abelian groups
 , AbelianGroup
-  -- * Group endomorphisms
-, GroupEndo(..)
 ) where
 
 
 import Data.Bool
 import Data.Functor.Const
+import Data.Functor.Contravariant
 import Data.Functor.Identity
 import Data.Semigroup (stimes)
 import Data.Int
@@ -115,8 +114,32 @@ instance Group b => Group (a -> b) where
   invert f = invert . f
   {-# inline invert #-}
 
+instance Group a => Group (Op a b) where
+  invert (Op f) = Op $ invert . f
+  {-# inline invert #-}
+
 instance Group a => Group (Dual a) where
   invert (Dual a) = Dual (invert a)
+  {-# inline invert #-}
+
+instance Group a => Group (Down a) where
+  invert (Down a) = Down (invert a)
+  {-# inline invert #-}
+
+instance Group a => Group (Endo a) where
+  invert (Endo a) = Endo (invert . a)
+  {-# inline invert #-}
+
+instance Group (Equivalence a) where
+  invert (Equivalence p) = Equivalence $ \a b -> not (p a b)
+  {-# inline invert #-}
+
+instance Group (Comparison a) where
+  invert (Comparison p) = Comparison $ \a b -> invert (p a b)
+  {-# inline invert #-}
+
+instance Group (Predicate a) where
+  invert (Predicate p) = Predicate $ \a -> not (p a)
   {-# inline invert #-}
 
 instance Group Any where
@@ -386,30 +409,13 @@ instance (AbelianGroup a, AbelianGroup b) => AbelianGroup (a,b)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c) => AbelianGroup (a,b,c)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d) => AbelianGroup (a,b,c,d)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d, AbelianGroup e) => AbelianGroup (a,b,c,d,e)
-
+instance AbelianGroup a => AbelianGroup (Down a)
+instance AbelianGroup a => AbelianGroup (Endo a)
 #if MIN_VERSION_base(4,12,0)
 instance (AbelianGroup (f a), AbelianGroup (g a)) => AbelianGroup ((f :*: g) a)
 instance AbelianGroup (f (g a)) => AbelianGroup ((f :.: g) a)
 #endif
-
--- -------------------------------------------------------------------- --
--- Group endomorphisms
-
--- | A group homomorphism from the group to itself.
---
--- 'GroupEndo' forms a near-ring for any group, since it is not necessarily
--- additive. When @g@ is an 'AbelianGroup', 'GroupEndo' forms a ring.
---
-newtype GroupEndo g = GroupEndo
-  { appGroupEndo :: g -> g }
-
-instance Semigroup (GroupEndo g) where
-  GroupEndo g <> GroupEndo g' = GroupEndo (g . g')
-
-instance Monoid (GroupEndo g) where
-  mempty = GroupEndo id
-
-instance Group g => Group (GroupEndo g) where
-  invert = GroupEndo . (invert .) . appGroupEndo
-
-instance AbelianGroup g => AbelianGroup (GroupEndo g)
+instance AbelianGroup (Equivalence a)
+instance AbelianGroup (Comparison a)
+instance AbelianGroup (Predicate a)
+instance AbelianGroup a => AbelianGroup (Op a b)

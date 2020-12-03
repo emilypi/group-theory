@@ -27,6 +27,7 @@ module Data.Group.Additive
 ) where
 
 
+import Data.Functor.Contravariant
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
@@ -62,6 +63,7 @@ class Group g => AdditiveGroup g where
 instance AdditiveGroup ()
 instance AdditiveGroup b => AdditiveGroup (a -> b)
 instance AdditiveGroup a => AdditiveGroup (Dual a)
+instance AdditiveGroup a => AdditiveGroup (Down a)
 instance AdditiveGroup Any
 instance AdditiveGroup (Sum Integer)
 instance AdditiveGroup (Sum Rational)
@@ -82,7 +84,8 @@ instance (AdditiveGroup a, AdditiveGroup b, AdditiveGroup c, AdditiveGroup d, Ad
 instance AdditiveGroup a => AdditiveGroup (Const a b)
 instance AdditiveGroup a => AdditiveGroup (Identity a)
 instance AdditiveGroup a => AdditiveGroup (Proxy a)
-instance AdditiveGroup Ordering
+instance AdditiveGroup a => AdditiveGroup (Endo a)
+instance AdditiveGroup a => AdditiveGroup (Op a b)
 
 -- | Infix alias for 'minus'.
 --
@@ -169,4 +172,6 @@ instance (AdditiveAbelianGroup a, AdditiveAbelianGroup b, AdditiveAbelianGroup c
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Const a b)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Identity a)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Proxy a)
-instance AdditiveAbelianGroup Ordering
+instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Down a)
+instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Endo a)
+instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Op a b)

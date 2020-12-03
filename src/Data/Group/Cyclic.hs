@@ -28,6 +28,7 @@ import Data.Group
 import Data.Int
 import Data.List
 import Data.Monoid
+import Data.Ord
 import Data.Proxy
 import Data.Word
 
@@ -139,6 +140,14 @@ instance (CyclicGroup a, CyclicGroup b, CyclicGroup c, CyclicGroup d) => CyclicG
 instance (CyclicGroup a, CyclicGroup b, CyclicGroup c, CyclicGroup d, CyclicGroup e) => CyclicGroup (a,b,c,d,e) where
   generator = (generator, generator, generator, generator, generator)
   {-# inlinable generator #-}
+
+instance CyclicGroup a => CyclicGroup (Down a) where
+  generator = Down generator
+  {-# inline generator #-}
+
+instance CyclicGroup a => CyclicGroup (Endo a) where
+  generator = Endo $ const generator
+  {-# inline generator #-}
 
 -- -------------------------------------------------------------------- --
 -- Cyclic group combinators
