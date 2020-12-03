@@ -1,6 +1,8 @@
 {-# language FlexibleInstances #-}
+{-# language PatternSynonyms #-}
 {-# language Safe #-}
 {-# language TypeOperators #-}
+{-# language ViewPatterns #-}
 -- |
 -- Module       : Data.Group
 -- Copyright    : (c) 2020 Reed Mullanix, Emily Pillmore
@@ -21,12 +23,12 @@ module Data.Group.Foldable
 ) where
 
 
-import Data.Bifunctor
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
 import Data.Group.Free
 import Data.Group.Free.Church
+import Data.Group.Permutation
 import Data.Monoid
 
 import GHC.Generics
@@ -77,11 +79,10 @@ class GroupFoldable t where
   --
   goldr
     :: Group g
-    => (a -> (g -> g, g -> g))
+    => (a -> Permutation g)
     -> t a
     -> (g -> g, g -> g)
-  goldr f = bimap appGroupEndo appGroupEndo
-    . goldMap (bimap GroupEndo GroupEndo . f)
+  goldr f = pairwise . goldMap f
   {-# inline goldr #-}
   {-# minimal goldMap | toFG #-}
 

@@ -57,7 +57,7 @@ infixl 7 ×
 --
 -- For example, the additive group of integers \( (ℤ, 0, +) \).
 --
-class AbelianGroup g => AdditiveGroup g where
+class Group g => AdditiveGroup g where
 
 instance AdditiveGroup ()
 instance AdditiveGroup b => AdditiveGroup (a -> b)
