@@ -20,6 +20,7 @@ module Data.Group.Free
 , simplify
 , interpret
 , interpret'
+, present
   -- * Free abelian groups
 , FreeAbelianGroup(..)
   -- ** Free abelian group combinators
@@ -38,6 +39,15 @@ import Data.Map (Map)
 import qualified Data.Map.Strict as Map
 import Data.Group
 
+-- $setup
+--
+-- >>> import qualified Prelude
+-- >>> import Data.Group
+-- >>> import Data.Monoid
+-- >>> import Data.Semigroup
+-- >>> import Data.Word
+-- >>> :set -XTypeApplications
+-- >>> :set -XFlexibleContexts
 
 -- | A representation of a free group over an alphabet @a@.
 --
@@ -85,7 +95,7 @@ instance Alternative FreeGroup where
 --
 -- === __Examples:__
 --
--- >>> simplify $ FreeGroup $ [Right 'a', Left 'b', Right 'c', Left 'c', Right 'b', Right 'a']
+-- >>> simplify $ FreeGroup [Right 'a', Left 'b', Right 'c', Left 'c', Right 'b', Right 'a']
 -- FreeGroup {runFreeGroup = [Right 'a',Right 'a']}
 --
 simplify :: (Eq a) => FreeGroup a -> FreeGroup a
@@ -110,6 +120,12 @@ interpret' (FreeGroup g) = foldl' go mempty g
     where
       go acc (Left a) = acc <> invert a
       go acc (Right a) = acc <> a
+
+-- | Present a 'Group' as a 'FreeGroup' modulo relations.
+--
+present :: Group g => (FreeGroup g -> g) -> FreeGroup g -> g
+present = ($)
+{-# inline present #-}
 
 -- | A representation of a free abelian group over an alphabet @a@.
 --

@@ -33,6 +33,7 @@ custom-setup
 
 library
   exposed-modules:
+    Control.Applicative.Cancelative
     Data.Group
     Data.Group.Additive
     Data.Group.Cyclic
