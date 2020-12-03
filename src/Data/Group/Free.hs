@@ -86,7 +86,7 @@ instance Alternative FreeGroup where
 -- === __Examples:__
 --
 -- >>> simplify $ FreeGroup $ [Right 'a', Left 'b', Right 'c', Left 'c', Right 'b', Right 'a']
--- FreeGroup {unFreeGroup = [Right 'a',Right 'a']}
+-- FreeGroup {runFreeGroup = [Right 'a',Right 'a']}
 --
 simplify :: (Eq a) => FreeGroup a -> FreeGroup a
 simplify (FreeGroup g) = FreeGroup $ foldr go [] g

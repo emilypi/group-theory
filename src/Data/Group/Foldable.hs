@@ -47,7 +47,7 @@ class GroupFoldable t where
   --
   -- The name is a pun on 'Group' and 'fold'.
   --
-  goldMap :: (Group g) => (a -> g) -> t a -> g
+  goldMap :: Group g => (a -> g) -> t a -> g
   goldMap f t = runFG (toFG t) f
   {-# inline goldMap #-}
 

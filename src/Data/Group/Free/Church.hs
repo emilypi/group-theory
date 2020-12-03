@@ -87,7 +87,10 @@ reifyFG fg = interpretFG $ fmap pure fg
 -- | Convert a concrete 'FreeGroup' to a Church-encoded free group.
 --
 reflectFG :: FreeGroup a -> FG a
-reflectFG (FreeGroup fg) = FG $ \k -> foldMap k (Compose fg)
+reflectFG (FreeGroup fg) = FG $ \k -> foldMap (go k) fg
+  where
+    go k (Left a) = invert (k a)
+    go k (Right a) = k a
 {-# inline reflectFG #-}
 
 -- | Present a 'Group' as a 'FreeGroup' modulo relations.
