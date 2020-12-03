@@ -270,6 +270,9 @@ a >< b = b <> a
 -- | Conjugate an element of a group by another element.
 -- When the group is abelian, conjugation is the identity.
 --
+-- Note: the first argument is the conjugating element so that
+-- it can be fixed to produce conjugacy classes of second argument.
+--
 -- === __Examples__:
 --
 -- >>> let x = Sum (3 :: Int)
@@ -277,11 +280,11 @@ a >< b = b <> a
 -- Sum {getSum = 3}
 --
 -- >>> let x = All True
--- >>> conjugate x (All False)
+-- >>> conjugate (All False) x
 -- All {getAll = False}
 --
 conjugate :: Group a => a -> a -> a
-conjugate a b = (b <> a) `minus` b
+conjugate g a = (g <> a) `minus` g
 {-# inline conjugate #-}
 
 -- -------------------------------------------------------------------- --
