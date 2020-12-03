@@ -37,7 +37,6 @@ import Control.Monad
 import Data.Group
 import Data.Group.Free
 import qualified Data.Map.Strict as Map
-import Data.Functor.Compose
 
 -- | The Church-encoding of a 'FreeGroup'.
 --

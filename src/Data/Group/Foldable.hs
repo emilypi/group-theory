@@ -21,9 +21,14 @@
 module Data.Group.Foldable
 ( -- * Group foldable
   GroupFoldable(..)
+  -- ** Group foldable combinators
+, gold
+, goldr
+, toFreeGroup
 ) where
 
 
+import Data.Functor.Compose
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
@@ -36,16 +41,40 @@ import Data.Monoid
 import GHC.Generics
 #endif
 
+
+-- $setup
+--
+-- >>> import qualified Prelude
+-- >>> import Data.Group
+-- >>> import Data.Monoid
+-- >>> import Data.Semigroup
+-- >>> import Data.Word
+-- >>> :set -XTypeApplications
+-- >>> :set -XFlexibleContexts
+
+-- -------------------------------------------------------------------- --
+-- Group foldable
+
 -- | The class of data structures that can be groupoidally folded.
 --
 class GroupFoldable t where
   -- | Apply a 'Group' fold to some container.
   --
-  -- Analagous to 'foldMap' for 'Group's, this function takes a means
-  -- of translating elements of some container into elements of a group,
-  -- constructing the group.
+  -- This function takes a container that can be represented as a
+  -- 'FreeGroup', and simplifies the container as a word in the
+  -- free group, producing a final output according to some
+  -- mapping of elements into the target group.
   --
   -- The name is a pun on 'Group' and 'fold'.
+  --
+  -- === __Examples__:
+  --
+  -- >>> let x = FreeGroup $ [Left (1 :: Sum Word8), Left 2, Right 2, Right 3]
+  -- >>> goldMap id x
+  -- Sum {getSum = 2}
+  --
+  -- >>> goldMap (\a -> if a < 2 then mempty else a) x
+  -- Sum {getSum = 3}
   --
   goldMap :: Group g => (a -> g) -> t a -> g
   goldMap f t = runFG (toFG t) f
@@ -60,32 +89,6 @@ class GroupFoldable t where
   toFG :: t a -> FG a
   toFG t = FG $ \k -> goldMap k t
   {-# inline toFG #-}
-
-  -- | Execute a group fold on a 'GroupFoldable' container.
-  --
-  -- The name is a pun on 'Group' and 'fold'.
-  --
-  gold :: Group g => t g -> g
-  gold = goldMap id
-  {-# inline gold #-}
-
-  -- | Convert a 'GroupFoldable' container into a 'FreeGroup'
-  --
-  toFreeGroup :: Group g => t g -> FreeGroup g
-  toFreeGroup = reifyFG . toFG
-  {-# inline toFreeGroup #-}
-
-  -- | A right group fold from a 'GroupFoldable' container to its permutation group
-  --
-  -- Analogous to 'foldr for monoidal 'Foldable's.
-  --
-  goldr
-    :: Group g
-    => (a -> Permutation g)
-    -> t a
-    -> Permutation g
-  goldr = goldMap
-  {-# inline goldr #-}
   {-# minimal goldMap | toFG #-}
 
 instance GroupFoldable FG where
@@ -109,6 +112,9 @@ instance GroupFoldable (Const a) where
 instance GroupFoldable Identity where
   goldMap f = f . runIdentity
 
+instance (GroupFoldable f, GroupFoldable g) => GroupFoldable (Compose f g) where
+  goldMap f = goldMap (goldMap f) . getCompose
+
 #if MIN_VERSION_base(4,12,0)
 instance (GroupFoldable f, GroupFoldable g) => GroupFoldable (f :*: g) where
   goldMap f (a :*: b) = goldMap f a <> goldMap f b
@@ -120,3 +126,40 @@ instance (GroupFoldable f, GroupFoldable g) => GroupFoldable (f :+: g) where
 instance (GroupFoldable f, GroupFoldable g) => GroupFoldable (f :.: g) where
   goldMap f = goldMap (goldMap f) . unComp1
 #endif
+
+-- -------------------------------------------------------------------- --
+-- Group foldable combinators
+
+-- | Simplify a word in 'GroupFoldable' container as a word
+-- in a 'FreeGroup'.
+--
+-- The name is a pun on 'Group' and 'fold'.
+--
+-- === __Examples__:
+--
+-- >>> let x = FreeGroup $ [Left (1 :: Sum Word8), Left 2, Right 2, Right 3]
+-- >>> gold x
+-- Sum {getSum = 2}
+--
+gold :: (GroupFoldable t, Group g) => t g -> g
+gold = goldMap id
+{-# inline gold #-}
+
+-- | Convert a 'GroupFoldable' container into a 'FreeGroup'
+--
+toFreeGroup :: (GroupFoldable t, Group g) => t g -> FreeGroup g
+toFreeGroup = reifyFG . toFG
+{-# inline toFreeGroup #-}
+
+-- | A right group fold from a 'GroupFoldable' container to its permutation group
+--
+-- Analogous to 'foldr for monoidal 'Foldable's.
+--
+goldr
+  :: GroupFoldable t
+  => Group g
+  => (a -> Permutation g)
+  -> t a
+  -> Permutation g
+goldr = goldMap
+{-# inline goldr #-}
