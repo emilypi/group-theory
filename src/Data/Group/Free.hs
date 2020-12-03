@@ -47,7 +47,7 @@ import Data.Group
 -- __Note:__ This does not perform simplification upon multiplication or construction.
 -- To do this, one should use 'simplify'.
 --
-newtype FreeGroup a = FreeGroup { unFreeGroup :: [Either a a] }
+newtype FreeGroup a = FreeGroup { runFreeGroup :: [Either a a] }
     deriving (Show, Eq, Ord)
 
 instance Semigroup (FreeGroup a) where
@@ -74,8 +74,8 @@ instance Monad FreeGroup where
     return = pure
     (FreeGroup g) >>= f = FreeGroup $ concatMap go g
         where
-          go (Left a)  = unFreeGroup $ invert $ f a
-          go (Right a) = unFreeGroup $ f a
+          go (Left a)  = runFreeGroup $ invert $ f a
+          go (Right a) = runFreeGroup $ f a
 
 instance Alternative FreeGroup where
     empty = mempty
