@@ -22,6 +22,8 @@ module Data.Group.Permutation
 , pairwise
 , (-$)
 , ($-)
+, embed
+, retract
 ) where
 
 
@@ -62,6 +64,7 @@ instance AdditiveGroup a => AdditiveGroup (Permutation a)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Permutation a)
 instance MultiplicativeGroup a => MultiplicativeGroup (Permutation a)
 
+
 -- -------------------------------------------------------------------- --
 -- Permutation group combinators
 
@@ -89,3 +92,17 @@ pairwise p = (to p, from p)
 ($-) :: Permutation a -> a -> a
 ($-) = from
 {-# inline ($-) #-}
+
+-- | Embed a 'Group' into the 'Permutation' group on it's underlying set.
+--
+embed :: (Group g) => g -> Permutation g
+embed g = Permutation { to = (g <>), from = (invert g <>) }
+
+-- | Get a group element out of the permutation group.
+-- This is a left inverse to 'embed', IE:
+-- @
+--    retract . embed = id
+-- @
+--
+retract :: (Group g) => Permutation g -> g
+retract p = p -$ mempty
