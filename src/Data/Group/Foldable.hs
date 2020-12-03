@@ -83,8 +83,8 @@ class GroupFoldable t where
     :: Group g
     => (a -> Permutation g)
     -> t a
-    -> (g -> g, g -> g)
-  goldr f = pairwise . goldMap f
+    -> Permutation g
+  goldr = goldMap
   {-# inline goldr #-}
   {-# minimal goldMap | toFG #-}
 
