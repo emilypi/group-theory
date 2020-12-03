@@ -34,11 +34,11 @@ infixr 0 $-, -$
 -- -------------------------------------------------------------------- --
 -- Permutations
 
--- | Isomorphism of two finite sets @a@ and @b@.
+-- | Isomorphism of a finite set onto itself. Each entry consists of one
+-- half of the isomorphism. 
 --
--- /Note/: This type should only have inhabitants if @a ~ b@ and
--- both are finite. It is the responsibility of the user to
--- provide inverse proofs for 'toA' and 'toB'. Be responsible!
+-- /Note/: It is the responsibility of the user to provide inverse proofs 
+-- for 'to' and 'from'. Be responsible!
 --
 data Permutation a = Permutation
   { to :: a -> a
