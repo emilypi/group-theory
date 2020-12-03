@@ -404,7 +404,7 @@ newtype GroupEndo g = GroupEndo
   { appGroupEndo :: g -> g }
 
 instance Semigroup (GroupEndo g) where
-  GroupEndo g <> GroupEndo g' = GroupEndo (g' . g)
+  GroupEndo g <> GroupEndo g' = GroupEndo (g . g')
 
 instance Monoid (GroupEndo g) where
   mempty = GroupEndo id
