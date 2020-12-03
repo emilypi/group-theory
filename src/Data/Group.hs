@@ -26,6 +26,7 @@ module Data.Group
   -- ** Group combinators
 , (><)
 , conjugate
+, unconjugate
 , order
   -- ** Group order
 , Order(..)
@@ -223,6 +224,46 @@ instance Group (Sum Word64) where
   invert = Prelude.negate
   {-# inline invert #-}
 
+instance Group (Sum (Ratio Int)) where
+  invert = Sum . Prelude.negate . getSum
+  {-# inline invert #-}
+
+instance Group (Sum (Ratio Int8)) where
+  invert = Sum . Prelude.negate . getSum
+  {-# inline invert #-}
+
+instance Group (Sum (Ratio Int16)) where
+  invert = Sum . Prelude.negate . getSum
+  {-# inline invert #-}
+
+instance Group (Sum (Ratio Int32)) where
+  invert = Sum . Prelude.negate . getSum
+  {-# inline invert #-}
+
+instance Group (Sum (Ratio Int64)) where
+  invert = Sum . Prelude.negate . getSum
+  {-# inline invert #-}
+
+instance Group (Sum (Ratio Word)) where
+  invert = Sum . Prelude.negate . getSum
+  {-# inline invert #-}
+
+instance Group (Sum (Ratio Word8)) where
+  invert = Sum . Prelude.negate . getSum
+  {-# inline invert #-}
+
+instance Group (Sum (Ratio Word16)) where
+  invert = Sum . Prelude.negate . getSum
+  {-# inline invert #-}
+
+instance Group (Sum (Ratio Word32)) where
+  invert = Sum . Prelude.negate . getSum
+  {-# inline invert #-}
+
+instance Group (Sum (Ratio Word64)) where
+  invert = Sum . Prelude.negate . getSum
+  {-# inline invert #-}
+
 instance Group (Product Rational) where
   invert = Product . Prelude.recip . getProduct
   {-# inline invert #-}
@@ -325,8 +366,7 @@ a >< b = b <> a
 -- | Conjugate an element of a group by another element.
 -- When the group is abelian, conjugation is the identity.
 --
--- Note: the first argument is the conjugating element so that
--- it can be fixed to produce conjugacy classes of second argument.
+-- Symbolically, this is \( a \mapsto gag^{-1} \).
 --
 -- === __Examples__:
 --
@@ -341,6 +381,22 @@ a >< b = b <> a
 conjugate :: Group a => a -> a -> a
 conjugate g a = (g <> a) `minus` g
 {-# inline conjugate #-}
+
+-- | Apply an inverse conjugate to a conjugated element.
+--
+-- @
+-- unconjugate . conjugate = id
+-- conjugate . unconjugate = id
+-- @
+--
+-- === __Examples__:
+--
+-- >>> let x = Sum (3 :: Int)
+-- >>> unconjugate x (conjugate x x)
+-- Sum {getSum = 3}
+--
+unconjugate :: Group a => a -> a -> a
+unconjugate g a = invert g <> a <> g
 
 -- -------------------------------------------------------------------- --
 -- Group order
@@ -409,7 +465,6 @@ instance AbelianGroup a => AbelianGroup (Dual a)
 instance AbelianGroup Any
 instance AbelianGroup All
 instance AbelianGroup (Sum Integer)
-instance AbelianGroup (Sum Rational)
 instance AbelianGroup (Sum Int)
 instance AbelianGroup (Sum Int8)
 instance AbelianGroup (Sum Int16)
@@ -420,8 +475,18 @@ instance AbelianGroup (Sum Word8)
 instance AbelianGroup (Sum Word16)
 instance AbelianGroup (Sum Word32)
 instance AbelianGroup (Sum Word64)
+instance AbelianGroup (Sum (Ratio Integer))
+instance AbelianGroup (Sum (Ratio Int))
+instance AbelianGroup (Sum (Ratio Int8))
+instance AbelianGroup (Sum (Ratio Int16))
+instance AbelianGroup (Sum (Ratio Int32))
+instance AbelianGroup (Sum (Ratio Int64))
+instance AbelianGroup (Sum (Ratio Word))
+instance AbelianGroup (Sum (Ratio Word8))
+instance AbelianGroup (Sum (Ratio Word16))
+instance AbelianGroup (Sum (Ratio Word32))
+instance AbelianGroup (Sum (Ratio Word64))
 instance AbelianGroup (Product (Ratio Integer))
-instance AbelianGroup (Product (Ratio Natural))
 instance AbelianGroup (Product (Ratio Int))
 instance AbelianGroup (Product (Ratio Int8))
 instance AbelianGroup (Product (Ratio Int16))
@@ -432,6 +497,7 @@ instance AbelianGroup (Product (Ratio Word8))
 instance AbelianGroup (Product (Ratio Word16))
 instance AbelianGroup (Product (Ratio Word32))
 instance AbelianGroup (Product (Ratio Word64))
+instance AbelianGroup (Product (Ratio Natural))
 instance AbelianGroup a => AbelianGroup (Const a b)
 instance AbelianGroup a => AbelianGroup (Identity a)
 instance AbelianGroup a => AbelianGroup (Proxy a)

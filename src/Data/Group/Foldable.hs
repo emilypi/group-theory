@@ -61,7 +61,7 @@ import GHC.Generics
 -- but is well-understood categorically: 'GroupFoldable's are
 -- functors (not necessarily 'Functor's) in the slice category \( [\mathcal{Hask}, \mathcal{Hask}] / F \),
 -- where \( F \) is the free group functor in \( \mathcal{Hask} \). Hence, they are
--- defined by their natural transformations \( K \Rightarrow F \) - i.e. 'toFG', or 'toFreeGroup'.
+-- defined by the natural transformations \( [\mathcal{Hask},\mathcal{Hask}](-, F) \) - i.e. 'toFG', or 'toFreeGroup'.
 --
 class GroupFoldable t where
   -- | Apply a 'Group' fold to some container.

@@ -35,9 +35,9 @@ infixr 0 $-, -$
 -- Permutations
 
 -- | Isomorphism of a finite set onto itself. Each entry consists of one
--- half of the isomorphism. 
+-- half of the isomorphism.
 --
--- /Note/: It is the responsibility of the user to provide inverse proofs 
+-- /Note/: It is the responsibility of the user to provide inverse proofs
 -- for 'to' and 'from'. Be responsible!
 --
 data Permutation a = Permutation
