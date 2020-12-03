@@ -71,6 +71,31 @@ infixr 6 ><
 -- -------------------------------------------------------------------- --
 -- Groups
 
+-- | The typeclass of groups (types with an associative binary operation that
+-- has an identity, and all inverses, i.e. a 'Monoid' with all inverses),
+-- representing the structural symmetries of a mathematical object.
+--
+-- Instances should satisfy the following:
+--
+-- [Right identity] @ x '<>' 'mempty' = x@
+-- [Left identity]  @'mempty' '<>' x = x@
+-- [Associativity]  @ x '<>' (y '<>' z) = (x '<>' y) '<>' z@
+-- [Concatenation]  @ 'mconcat' = 'foldr' ('<>') 'mempty'@
+-- [Right inverses] @ x '<>' 'invert' x = 'mempty' @
+-- [Left inverses]  @ 'invert' x '<>' x = 'mempty' @
+--
+-- Some types can be viewed as a group in more than one way,
+-- e.g. both addition and multiplication on numbers.
+-- In such cases we often define @newtype@s and make those instances
+-- of 'Group', e.g. 'Data.Semigroup.Sum' and 'Data.Semigroup.Product'.
+-- Often in practice such differences between addition and
+-- multiplication-like operations matter (e.g. when defining rings), and
+-- so, classes "additive" (the underlying operation is addition-like) and
+-- "multiplicative" group classes are provided in vis 'Data.Group.Additive.AdditiveGroup' and
+-- 'Data.Group.Multiplicative.MultiplicativeGroup'.
+--
+-- Categorically, 'Group's may be viewed single-object groupoids.
+--
 class Monoid a => Group a where
   invert :: a -> a
   invert a = mempty `minus` a
@@ -371,6 +396,12 @@ order a = go 0 a where
 -- -------------------------------------------------------------------- --
 -- Abelian (commutative) groups
 
+-- | Commutative 'Group's.
+--
+-- Instances of 'AbelianGroup' satisfy the following laws:
+--
+-- [Commutativity] @x <> y = y <> x@
+--
 class Group a => AbelianGroup a
 instance AbelianGroup ()
 instance AbelianGroup b => AbelianGroup (a -> b)

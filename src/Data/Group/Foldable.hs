@@ -57,6 +57,12 @@ import GHC.Generics
 
 -- | The class of data structures that can be groupoidally folded.
 --
+-- 'GroupFoldable' has difficult-to-define laws in terms of Haskell,
+-- but is well-understood categorically: 'GroupFoldable's are
+-- functors (not necessarily 'Functor's) in the slice category \( [\mathcal{Hask}, \mathcal{Hask}] / F \),
+-- where \( F \) is the free group functor in \( \mathcal{Hask} \). Hence, they are
+-- defined by their natural transformations \( K \Rightarrow F \) - i.e. 'toFG', or 'toFreeGroup'.
+--
 class GroupFoldable t where
   -- | Apply a 'Group' fold to some container.
   --
@@ -65,7 +71,7 @@ class GroupFoldable t where
   -- free group, producing a final output according to some
   -- mapping of elements into the target group.
   --
-  -- The name is a pun on 'Group' and 'fold'.
+  -- The name is a pun on 'Group' and 'Data.Foldable.fold'.
   --
   -- === __Examples__:
   --
@@ -83,7 +89,7 @@ class GroupFoldable t where
   -- | Translate a 'GroupFoldable' container into a Church-encoded
   -- free group.
   --
-  -- Analagous to 'toList' for 'Foldable', if 'toList' respected the
+  -- Analagous to 'Data.Foldable.toList' for 'Foldable', if 'Data.Foldable.toList' respected the
   -- associativity of ⊥.
   --
   toFG :: t a -> FG a
@@ -133,7 +139,7 @@ instance (GroupFoldable f, GroupFoldable g) => GroupFoldable (f :.: g) where
 -- | Simplify a word in 'GroupFoldable' container as a word
 -- in a 'FreeGroup'.
 --
--- The name is a pun on 'Group' and 'fold'.
+-- The name is a pun on 'Group' and 'Data.Foldable.fold'.
 --
 -- === __Examples__:
 --
@@ -153,7 +159,7 @@ toFreeGroup = reifyFG . toFG
 
 -- | A right group fold from a 'GroupFoldable' container to its permutation group
 --
--- Analogous to 'foldr for monoidal 'Foldable's.
+-- Analogous to 'Data.Foldable.foldr' for monoidal 'Foldable's.
 --
 goldr
   :: GroupFoldable t

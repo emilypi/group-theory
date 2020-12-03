@@ -102,6 +102,8 @@ safeOrder = order
 -- -------------------------------------------------------------------- --
 -- Finite abelian groups
 
+-- | Commutative 'FiniteGroup's
+--
 class FiniteGroup g => FiniteAbelianGroup g
 
 instance FiniteAbelianGroup ()

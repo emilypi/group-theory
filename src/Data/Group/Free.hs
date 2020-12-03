@@ -10,8 +10,8 @@
 -- Stability    : stable
 -- Portability  : non-portable
 --
--- This module provides definitions for 'FreeGroup's, 'FreeAbelianGroup's,
--- and 'GroupFoldable', along with useful combinators.
+-- This module provides definitions for 'FreeGroup's and 'FreeAbelianGroup's,
+-- along with useful combinators.
 --
 module Data.Group.Free
 ( -- * Free groups
@@ -132,7 +132,7 @@ instance (Ord a) => Group (FreeAbelianGroup a) where
 -- NOTE: We can't implement Functor/Applicative/Monad here
 -- due to the Ord constraint. C'est La Vie!
 
--- | Functorial 'fmap' for a 'FreeAbelian' group.
+-- | Functorial 'fmap' for a 'FreeAbelianGroup'.
 --
 abmap :: (Ord b) => (a -> b) -> FreeAbelianGroup a -> FreeAbelianGroup b
 abmap f (FreeAbelianGroup g) = FreeAbelianGroup $ Map.mapKeys f g
@@ -142,7 +142,7 @@ abmap f (FreeAbelianGroup g) = FreeAbelianGroup $ Map.mapKeys f g
 singleton :: a -> FreeAbelianGroup a
 singleton a = FreeAbelianGroup $ Map.singleton a 1
 
--- | Monadic 'join' for a 'FreeAbelian' group.
+-- | Monadic 'join' for a 'FreeAbelianGroup'.
 --
 abjoin :: (Ord a) => FreeAbelianGroup (FreeAbelianGroup a) -> FreeAbelianGroup a
 abjoin (FreeAbelianGroup g) = FreeAbelianGroup $ Map.foldMapWithKey go g
