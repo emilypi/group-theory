@@ -1,3 +1,4 @@
+{-# language CPP #-}
 {-# language FlexibleInstances #-}
 {-# language Safe #-}
 -- |
@@ -28,7 +29,9 @@ import Data.Functor.Identity
 import Data.Group
 import Data.Int
 import Data.Monoid
+#if __GLASGOW_HASKELL__ >= 810
 import Data.Ord
+#endif
 import Data.Proxy
 import Data.Word
 
@@ -75,7 +78,10 @@ instance FiniteGroup (Sum Word16)
 instance FiniteGroup (Sum Word32)
 instance FiniteGroup (Sum Word64)
 instance FiniteGroup Ordering
+
+#if __GLASGOW_HASKELL__ >= 810
 instance FiniteGroup a => FiniteGroup (Down a)
+#endif
 
 -- -------------------------------------------------------------------- --
 -- Finite group combinators
@@ -126,4 +132,7 @@ instance (FiniteAbelianGroup a, FiniteAbelianGroup b, FiniteAbelianGroup c) => F
 instance (FiniteAbelianGroup a, FiniteAbelianGroup b, FiniteAbelianGroup c, FiniteAbelianGroup d) => FiniteAbelianGroup (a,b,c,d)
 instance (FiniteAbelianGroup a, FiniteAbelianGroup b, FiniteAbelianGroup c, FiniteAbelianGroup d, FiniteAbelianGroup e) => FiniteAbelianGroup (a,b,c,d,e)
 instance FiniteAbelianGroup Ordering
+
+#if __GLASGOW_HASKELL__ >= 810
 instance FiniteAbelianGroup a => FiniteAbelianGroup (Down a)
+#endif
