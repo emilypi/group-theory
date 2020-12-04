@@ -529,7 +529,9 @@ instance (Eq g, Group g) => Group (Abelianizer g) where
 -- | Quotient a pair of group elements by their commutator.
 --
 -- Ranging over the entire group, this operation constructs
--- the the commutator sub-group of @g@.
+-- the quotient of the group by its commutator sub-group
+-- \( G / [G,G] \), where \( [G,G] \) maps to the kerel of
+-- 'abelianize'.
 --
 abelianize :: (Eq g, Group g) => g -> g -> Abelianizer g
 abelianize g g'
