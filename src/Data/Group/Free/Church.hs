@@ -48,28 +48,28 @@ import qualified Data.Map.Strict as Map
 newtype FG a = FG { runFG :: forall g. (Group g) => (a -> g) -> g }
 
 instance Semigroup (FG a) where
-    (FG g) <> (FG g') = FG $ \k -> g k <> g' k
+  (FG g) <> (FG g') = FG $ \k -> g k <> g' k
 
 instance Monoid (FG a) where
-    mempty = FG $ const mempty
+  mempty = FG $ const mempty
 
 instance Group (FG a) where
-    invert (FG g) = FG $ \k -> invert $ g k
+  invert (FG g) = FG (invert . g)
 
 instance Functor FG where
-    fmap f (FG fa) = FG $ \k -> fa (k . f)
+  fmap f (FG fa) = FG $ \k -> fa (k . f)
 
 instance Applicative FG where
-    pure a = FG $ \k -> k a
-    (<*>) = ap
+  pure a = FG ($ a)
+  (<*>) = ap
 
 instance Monad FG where
-    return = pure
-    (FG fg) >>= f = FG $ \k -> fg (\a -> (runFG $ f a) k)
+  return = pure
+  (FG fg) >>= f = FG $ \k -> fg (\a -> (runFG $ f a) k)
 
 instance Alternative FG where
-    empty = mempty
-    (<|>) = (<>)
+  empty = mempty
+  (<|>) = (<>)
 
 -- | Interpret a Church-encoded free group as a concrete 'FreeGroup'.
 --
@@ -109,28 +109,28 @@ presentFG = flip ($)
 newtype FA a = FA { runFA :: forall g. (Group g) => (a -> Int -> g) -> g }
 
 instance Semigroup (FA a) where
-    (FA g) <> (FA g') = FA $ \k -> g k <> g' k
+  (FA g) <> (FA g') = FA $ \k -> g k <> g' k
 
 instance Monoid (FA a) where
-    mempty = FA $ const mempty
+  mempty = FA $ const mempty
 
 instance Group (FA a) where
-    invert (FA g) = FA $ \k -> invert $ g k
+  invert (FA g) = FA (invert . g)
 
 instance Functor FA where
-    fmap f (FA fa) = FA $ \k -> fa (k . f)
+  fmap f (FA fa) = FA $ \k -> fa (k . f)
 
 instance Applicative FA where
-    pure a = FA $ \k -> k a 1
-    (<*>) = ap
+  pure a = FA $ \k -> k a 1
+  (<*>) = ap
 
 instance Monad FA where
-    return = pure
-    (FA fa) >>= f = FA $ \k -> fa (\a n -> gtimes n $ (runFA $ f a) k)
+  return = pure
+  (FA fa) >>= f = FA $ \k -> fa (\a n -> gtimes n $ (runFA $ f a) k)
 
 instance Alternative FA where
-    empty = mempty
-    (<|>) = (<>)
+  empty = mempty
+  (<|>) = (<>)
 
 -- | Interpret a Church-encoded free abelian group as a concrete 'FreeAbelianGroup'.
 --
@@ -154,5 +154,5 @@ reflectFA (FreeAbelianGroup fa) = FA $ \k -> Map.foldMapWithKey k fa
 -- turning it into a standard free group.
 --
 forgetFA :: Group a => FA a -> FG a
-forgetFA fa = FG $ \k -> k $ interpretFA fa
+forgetFA fa = FG ($ interpretFA fa)
 {-# inline forgetFA #-}
