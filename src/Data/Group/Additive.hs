@@ -68,7 +68,6 @@ instance AdditiveGroup ()
 instance AdditiveGroup b => AdditiveGroup (a -> b)
 instance AdditiveGroup a => AdditiveGroup (Dual a)
 instance AdditiveGroup a => AdditiveGroup (Down a)
-instance AdditiveGroup Any
 instance AdditiveGroup (Sum Integer)
 instance AdditiveGroup (Sum Int)
 instance AdditiveGroup (Sum Int8)
@@ -98,7 +97,7 @@ instance (AdditiveGroup a, AdditiveGroup b, AdditiveGroup c, AdditiveGroup d, Ad
 instance AdditiveGroup a => AdditiveGroup (Const a b)
 instance AdditiveGroup a => AdditiveGroup (Identity a)
 instance AdditiveGroup a => AdditiveGroup (Proxy a)
-instance AdditiveGroup a => AdditiveGroup (Endo a)
+-- instance AdditiveGroup a => AdditiveGroup (Endo a)
 #if __GLASGOW_HASKELL__ > 804
 instance AdditiveGroup a => AdditiveGroup (Op a b)
 #endif
@@ -110,10 +109,6 @@ instance AdditiveGroup a => AdditiveGroup (Op a b)
 -- >>> let x = Sum (3 :: Int)
 -- >>> x - x
 -- Sum {getSum = 0}
---
--- >>> let x = Any True
--- >>> x - x
--- Any {getAny = True}
 --
 (-) :: AdditiveGroup a => a -> a -> a
 (-) = minus
@@ -168,7 +163,6 @@ class (AbelianGroup g, AdditiveGroup g) => AdditiveAbelianGroup g
 instance AdditiveAbelianGroup ()
 instance AdditiveAbelianGroup b => AdditiveAbelianGroup (a -> b)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Dual a)
-instance AdditiveAbelianGroup Any
 instance AdditiveAbelianGroup (Sum Integer)
 instance AdditiveAbelianGroup (Sum Int)
 instance AdditiveAbelianGroup (Sum Int8)
@@ -199,7 +193,7 @@ instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Const a b)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Identity a)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Proxy a)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Down a)
-instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Endo a)
+-- instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Endo a)
 #if __GLASGOW_HASKELL__ > 804
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Op a b)
 #endif

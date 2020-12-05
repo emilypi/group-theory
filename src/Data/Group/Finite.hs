@@ -65,8 +65,6 @@ instance (FiniteGroup a, FiniteGroup b) => FiniteGroup (a,b)
 instance (FiniteGroup a, FiniteGroup b, FiniteGroup c) => FiniteGroup (a,b,c)
 instance (FiniteGroup a, FiniteGroup b, FiniteGroup c, FiniteGroup d) => FiniteGroup (a,b,c,d)
 instance (FiniteGroup a, FiniteGroup b, FiniteGroup c, FiniteGroup d, FiniteGroup e) => FiniteGroup (a,b,c,d,e)
-instance FiniteGroup Any
-instance FiniteGroup All
 instance FiniteGroup (Sum Int)
 instance FiniteGroup (Sum Int8)
 instance FiniteGroup (Sum Int16)
@@ -94,12 +92,6 @@ instance FiniteGroup a => FiniteGroup (Down a)
 --
 -- >>> order @(Sum Word8) 3
 -- Finite 255
---
--- >>> order (Any False)
--- Finite 1
---
--- >>> order (All False)
--- Infinite
 --
 safeOrder :: (Eq g, FiniteGroup g) => g -> Order
 safeOrder = order

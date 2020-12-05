@@ -159,9 +159,9 @@ instance Group a => Group (Down a) where
   invert (Down a) = Down (invert a)
   {-# inline invert #-}
 
-instance Group a => Group (Endo a) where
-  invert (Endo a) = Endo (invert . a)
-  {-# inline invert #-}
+-- nstance Group a => Group (Endo a) where
+--  invert (Endo a) = Endo (invert . a)
+--  {-# inline invert #-}
 
 #if __GLASGOW_HASKELL__ > 804
 instance Group (Equivalence a) where
@@ -180,14 +180,6 @@ instance Group a => Group (Op a b) where
   invert (Op f) = Op $ invert . f
   {-# inline invert #-}
 #endif
-
-instance Group Any where
-  invert (Any b) = Any $ bool True False b
-  {-# inline invert #-}
-
-instance Group All where
-  invert (All b) = All $ bool True False b
-  {-# inline invert #-}
 
 instance Group (Sum Integer) where
   invert = Prelude.negate
@@ -387,10 +379,6 @@ a >< b = b <> a
 -- >>> conjugate x x
 -- Sum {getSum = 3}
 --
--- >>> let x = All True
--- >>> conjugate (All False) x
--- All {getAll = False}
---
 conjugate :: Group a => a -> a -> a
 conjugate g a = (g <> a) `minus` g
 {-# inline conjugate #-}
@@ -427,8 +415,8 @@ pattern Conjugate t <- (\(g,a) -> (g, conjugate g a) -> t) where
 -- | The order of a group element.
 --
 -- The order of a group element can either be infinite,
--- as in the case of @All False@, or finite, as in the
--- case of @All True@.
+-- as in the case of @Sum Integer@, or finite, as in the
+-- case of @Sum Word8@.
 --
 data Order = Infinite | Finite !Natural
   deriving (Eq, Show)
@@ -456,18 +444,12 @@ pattern Finitary n <- (order -> Finite n)
 -- >>> order @(Sum Word8) 3
 -- Finite 255
 --
--- >>> order (Any False)
--- Finite 1
---
--- >>> order (All False)
--- Infinite
---
 order :: (Eq g, Group g) => g -> Order
 order a = go 0 a where
   go !n g
     -- guard against ().
     | g == mempty, n > 0 = Finite n
-    -- guard against infinite cases like @All False@.
+    -- guard against infinite cyclic cases
     | g == a, n > 0 = Infinite
     | otherwise = go (succ n) (g <> a)
 {-# inline order #-}
@@ -569,8 +551,7 @@ class Group a => AbelianGroup a
 instance AbelianGroup ()
 instance AbelianGroup b => AbelianGroup (a -> b)
 instance AbelianGroup a => AbelianGroup (Dual a)
-instance AbelianGroup Any
-instance AbelianGroup All
+
 instance AbelianGroup (Sum Integer)
 instance AbelianGroup (Sum Int)
 instance AbelianGroup (Sum Int8)
@@ -614,7 +595,7 @@ instance (AbelianGroup a, AbelianGroup b, AbelianGroup c) => AbelianGroup (a,b,c
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d) => AbelianGroup (a,b,c,d)
 instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d, AbelianGroup e) => AbelianGroup (a,b,c,d,e)
 instance AbelianGroup a => AbelianGroup (Down a)
-instance AbelianGroup a => AbelianGroup (Endo a)
+-- instance AbelianGroup a => AbelianGroup (Endo a)
 #if MIN_VERSION_base(4,12,0)
 instance (AbelianGroup (f a), AbelianGroup (g a)) => AbelianGroup ((f :*: g) a)
 instance AbelianGroup (f (g a)) => AbelianGroup ((f :.: g) a)
