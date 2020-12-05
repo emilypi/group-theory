@@ -65,7 +65,7 @@ class Alternative f => Cancelative f where
   --
   -- >>> let x = FreeGroup [Left (Sum (2 :: Word8)), Right (Sum 3)]
   -- >>> cancel x
-  -- FreeGroup {runFreeGroup = [Right (Sum {getSum = 2}),Left (Sum {getSum = 3})]}
+  -- FreeGroup {runFreeGroup = [Left (Sum {getSum = 3}),Right (Sum {getSum = 2})]}
   --
   cancel :: f a -> f a
   default cancel :: Group (f a) => f a -> f a
@@ -80,6 +80,9 @@ instance Cancelative FA where
 
 instance Cancelative FreeGroup where
   cancel = invert
+    . FreeGroup
+    . reverse
+    . runFreeGroup
 
 instance Cancelative Proxy where
   cancel _ = Proxy
