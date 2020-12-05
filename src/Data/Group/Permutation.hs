@@ -42,7 +42,9 @@ infixr 0 $-, -$
 --
 data Permutation a = Permutation
   { to :: a -> a
+    -- ^ The forward half of the bijection
   , from :: a -> a
+    -- ^ The inverse half of the bijection
   }
 
 -- instance Profunctor Permutation where
@@ -55,7 +57,7 @@ instance Monoid a => Monoid (Permutation a) where
   mempty = Permutation id id
 
 instance Group a => Group (Permutation a) where
-  invert p = Permutation (invert . to p) (from p . invert)
+  invert (Permutation t f) = Permutation (f . t) (t . f)
 
 instance AbelianGroup a => AbelianGroup (Permutation a)
 instance AdditiveGroup a => AdditiveGroup (Permutation a)

@@ -123,8 +123,8 @@ interpret' (FreeGroup g) = foldl' go mempty g
 
 -- | Present a 'Group' as a 'FreeGroup' modulo relations.
 --
-present :: Group g => (FreeGroup g -> g) -> FreeGroup g -> g
-present = ($)
+present :: Group g => FreeGroup g -> (FreeGroup g -> g) -> g
+present = flip ($)
 {-# inline present #-}
 
 -- | A representation of a free abelian group over an alphabet @a@.

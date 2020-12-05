@@ -94,8 +94,8 @@ reflectFG (FreeGroup fg) = FG $ \k -> foldMap (go k) fg
 
 -- | Present a 'Group' as a 'FG' modulo relations.
 --
-presentFG :: Group g => (FG g -> g) -> FG g -> g
-presentFG = ($)
+presentFG :: Group g => FG g -> (FG g -> g) -> g
+presentFG = flip ($)
 {-# inline presentFG #-}
 
 ----------------------------------------
