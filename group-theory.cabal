@@ -42,6 +42,7 @@ library
     Data.Group.Foldable
     Data.Group.Free
     Data.Group.Free.Church
+    Data.Group.Free.Product
     Data.Group.Multiplicative
     Data.Group.Permutation
 
