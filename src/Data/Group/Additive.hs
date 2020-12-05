@@ -1,5 +1,6 @@
+{-# language CPP #-}
 {-# language FlexibleInstances #-}
--- {-# language Safe #-}
+{-# language Safe #-}
 -- |
 -- Module       : Data.Group.Additive
 -- Copyright    : (c) 2020 Emily Pillmore
@@ -27,7 +28,9 @@ module Data.Group.Additive
 ) where
 
 
+#if __GLASGOW_HASKELL__ > 804
 import Data.Functor.Contravariant
+#endif
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
@@ -96,7 +99,9 @@ instance AdditiveGroup a => AdditiveGroup (Const a b)
 instance AdditiveGroup a => AdditiveGroup (Identity a)
 instance AdditiveGroup a => AdditiveGroup (Proxy a)
 instance AdditiveGroup a => AdditiveGroup (Endo a)
+#if __GLASGOW_HASKELL__ > 804
 instance AdditiveGroup a => AdditiveGroup (Op a b)
+#endif
 
 -- | Infix alias for 'minus'.
 --
@@ -195,4 +200,6 @@ instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Identity a)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Proxy a)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Down a)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Endo a)
+#if __GLASGOW_HASKELL__ > 804
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Op a b)
+#endif

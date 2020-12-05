@@ -21,7 +21,7 @@ module Data.Group.Free.Church
 , interpretFG
 , reifyFG
 , reflectFG
-, present
+, presentFG
   -- * Church-encoded free abelian groups
 , FA(..)
   -- ** Church-encoded free abelian group combinators
@@ -92,11 +92,11 @@ reflectFG (FreeGroup fg) = FG $ \k -> foldMap (go k) fg
     go k (Right a) = k a
 {-# inline reflectFG #-}
 
--- | Present a 'Group' as a 'FreeGroup' modulo relations.
+-- | Present a 'Group' as a 'FG' modulo relations.
 --
-present :: Group g => (FreeGroup g -> g) -> FG g -> g
-present p = p . reifyFG
-{-# inline present #-}
+presentFG :: Group g => (FG g -> g) -> FG g -> g
+presentFG = ($)
+{-# inline presentFG #-}
 
 ----------------------------------------
 -- Free Abelian Groups

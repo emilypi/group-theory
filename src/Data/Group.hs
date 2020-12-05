@@ -47,7 +47,9 @@ module Data.Group
 
 import Data.Bool
 import Data.Functor.Const
+#if __GLASGOW_HASKELL__ > 804
 import Data.Functor.Contravariant
+#endif
 import Data.Functor.Identity
 import Data.Semigroup (stimes)
 import Data.Int
@@ -148,10 +150,6 @@ instance Group b => Group (a -> b) where
   invert f = invert . f
   {-# inline invert #-}
 
-instance Group a => Group (Op a b) where
-  invert (Op f) = Op $ invert . f
-  {-# inline invert #-}
-
 instance Group a => Group (Dual a) where
   invert (Dual a) = Dual (invert a)
   {-# inline invert #-}
@@ -164,6 +162,7 @@ instance Group a => Group (Endo a) where
   invert (Endo a) = Endo (invert . a)
   {-# inline invert #-}
 
+#if __GLASGOW_HASKELL__ > 804
 instance Group (Equivalence a) where
   invert (Equivalence p) = Equivalence $ \a b -> not (p a b)
   {-# inline invert #-}
@@ -175,6 +174,11 @@ instance Group (Comparison a) where
 instance Group (Predicate a) where
   invert (Predicate p) = Predicate $ \a -> not (p a)
   {-# inline invert #-}
+
+instance Group a => Group (Op a b) where
+  invert (Op f) = Op $ invert . f
+  {-# inline invert #-}
+#endif
 
 instance Group Any where
   invert (Any b) = Any $ bool True False b
@@ -525,7 +529,9 @@ instance (Eq g, Group g) => Group (Abelianizer g) where
 -- | Quotient a pair of group elements by their commutator.
 --
 -- Ranging over the entire group, this operation constructs
--- the the commutator sub-group of @g@.
+-- the quotient of the group by its commutator sub-group
+-- \( G / [G,G] \), where \( [G,G] \) maps to the kerel of
+-- 'abelianize'.
 --
 abelianize :: (Eq g, Group g) => g -> g -> Abelianizer g
 abelianize g g'
@@ -609,8 +615,12 @@ instance AbelianGroup a => AbelianGroup (Endo a)
 instance (AbelianGroup (f a), AbelianGroup (g a)) => AbelianGroup ((f :*: g) a)
 instance AbelianGroup (f (g a)) => AbelianGroup ((f :.: g) a)
 #endif
+
+#if __GLASGOW_HASKELL__ > 804
 instance AbelianGroup (Equivalence a)
 instance AbelianGroup (Comparison a)
 instance AbelianGroup (Predicate a)
 instance AbelianGroup a => AbelianGroup (Op a b)
+#endif
+
 instance (Eq a, AbelianGroup a) => AbelianGroup (Abelianizer a)
