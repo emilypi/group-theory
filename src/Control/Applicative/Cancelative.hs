@@ -1,3 +1,4 @@
+{-# language DefaultSignatures #-}
 {-# language Safe #-}
 -- |
 -- Module       : Control.Applicative.Cancelative
@@ -47,7 +48,8 @@ import Data.Proxy
 --
 -- 'Cancelative' functors have the following laws:
 --
--- [Cancelation] @ cancel a <|> a = empty @
+-- [Left Cancelation] @ 'cancel' a '<|>' a = 'empty' @
+-- [Rigth Cancelation] @ a '<|>' 'cancel' a = 'empty' @
 --
 -- This is analogous to a group operation on applicative functors,
 -- in the sense that 'Alternative' forms a monoid. A straight-
@@ -56,8 +58,8 @@ import Data.Proxy
 --
 class Alternative f => Cancelative f where
   -- | Invert (or 'cancel') a 'Cancelative' functor, such that, if the
-  -- functor is also a 'GroupFoldable', then @'Data.Group.Foldable.gold' . cancel@ is
-  -- the inverse evaluating a word in the functor.
+  -- functor is also a 'Data.Group.Foldable.GroupFoldable', then @'Data.Group.Foldable.gold' '.' 'cancel'@
+  -- amounts to evaluating the inverse of a word in the functor.
   --
   -- === __Examples:__
   --
@@ -66,6 +68,8 @@ class Alternative f => Cancelative f where
   -- FreeGroup {runFreeGroup = [Right (Sum {getSum = 2}),Left (Sum {getSum = 3})]}
   --
   cancel :: f a -> f a
+  default cancel :: Group (f a) => f a -> f a
+  cancel = invert
   {-# minimal cancel #-}
 
 instance Cancelative FG where

@@ -147,7 +147,7 @@ instance AdditiveGroup a => AdditiveGroup (Op a b)
 -- This represents @ℕ@-indexed copowers of an element @g@ of
 -- an additive group, i.e. iterated coproducts of group elements.
 -- This is representable by the universal property
--- \( C(∐_ₙ g, x) ≅ C(g, x)ⁿ \).
+-- \( C(∐_n g, x) ≅ C(g, x)^n \).
 --
 -- === __Examples__:
 --

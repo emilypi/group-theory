@@ -38,7 +38,8 @@ module Data.Group
   -- ** Abelianization
 , Abelianizer(..)
 , abelianize
-, pattern Commutated
+, commutate
+, pattern Abelianized
 , pattern Quotiented
   -- * Abelian groups
 , AbelianGroup
@@ -113,7 +114,7 @@ class Monoid a => Group a where
   {-# inline invert #-}
 
   -- | Similar to 'stimes' from 'Data.Semigroup', but handles
-  -- negative numbers by using 'invert'.
+  -- negative powers by using 'invert' appropriately.
   --
   -- === __Examples:__
   --
@@ -378,7 +379,7 @@ a >< b = b <> a
 -- | Conjugate an element of a group by another element.
 -- When the group is abelian, conjugation is the identity.
 --
--- Symbolically, this is \( a \mapsto gag^{-1} \).
+-- Symbolically, this is \( (g,a) \mapsto gag^{-1} \).
 --
 -- === __Examples__:
 --
@@ -446,7 +447,7 @@ pattern Finitary n <- (order -> Finite n)
 
 -- | Calculate the exponent of a particular element in a group.
 --
--- __Warning:__ If 'order' expects a 'FiniteGroup', this is gauranteed
+-- __Warning:__ If 'order' expects a 'Data.Group.FiniteGroup', this is gauranteed
 -- to terminate. However, this is not true of groups in general. This will
 -- spin forever if you give it something like non-zero @Sum Integer@.
 --
@@ -476,11 +477,10 @@ order a = go 0 a where
 
 -- | Quotient a pair of group elements by their commutator.
 --
--- The quotient \( G / [G,G] \) forms an abelian group, and 'Abelianizer'
+-- The of the quotient \( G / [G,G] \) forms an abelian group, and 'Abelianizer'
 -- forms a functor from the category of groups to the category of Abelian groups.
--- This functor is, in fact, a monad in \( Grp \) when this functor
--- is composed with the forgetful functor \( Ab \rightarrow Grp \)
--- "forgetting" commutativity.
+-- This functor is left adjoint to the inclusion functor \( Ab \rightarrow Grp \),
+-- forming a monad in \( Grp \).
 --
 data Abelianizer a = Quot | Commuted a
   deriving stock (Eq, Show)
@@ -524,25 +524,31 @@ instance (Eq g, Group g) => Group (Abelianizer g) where
   invert Quot = Quot
   invert (Commuted a) = Commuted (invert a)
 
+-- | Take the commutator of two elements of a group.
+--
+commutate :: Group g => g -> g -> g
+commutate g g' = g <> g' <> invert g <> invert g'
+{-# inline commutate #-}
+
 -- | Quotient a pair of group elements by their commutator.
 --
 -- Ranging over the entire group, this operation constructs
 -- the quotient of the group by its commutator sub-group
--- \( G / [G,G] \), where \( [G,G] \) maps to the kerel of
--- 'abelianize'.
+-- \( G / [G,G] \).
 --
 abelianize :: (Eq g, Group g) => g -> g -> Abelianizer g
 abelianize g g'
   | x == mempty = Quot
   | otherwise = Commuted x
   where
-    x = g <> g' <> invert g <> invert g'
+    x = commutate g g'
+{-# inline abelianize #-}
 
 -- | A unidirectional pattern synonym for elements of a group
 -- modulo commutators which are __not__ the identity.
 --
-pattern Commutated :: (Eq g, Group g) => g -> (g,g)
-pattern Commutated x <- (uncurry abelianize -> Commuted x)
+pattern Abelianized :: (Eq g, Group g) => g -> (g,g)
+pattern Abelianized x <- (uncurry abelianize -> Commuted x)
 
 -- | A unidirectional pattern synonym for elements of a group
 -- modulo commutators which are the identity.

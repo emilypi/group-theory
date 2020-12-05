@@ -124,7 +124,7 @@ instance MultiplicativeGroup a => MultiplicativeGroup (Proxy a)
 -- This represents @ℕ@-indexed powers of an element @g@ of
 -- a multiplicative group, i.e. iterated products of group elements.
 -- This is representable by the universal property
--- \( C(x, ∏_ₙ g) ≅ C(x, g)ⁿ \).
+-- \( C(x, ∏_n g) ≅ C(x, g)^n \).
 --
 -- === __Examples__:
 --

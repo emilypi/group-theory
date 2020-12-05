@@ -4,7 +4,8 @@ version:         0.1.0.0
 synopsis:        The theory of groups
 description:
   This package includes definitions for Groups (monoids with invertibility), including
-  finite, simple, cyclic, and permutation groups.
+  finite, fre, simple, cyclic, and permutation groups. Additionally, we add the concept
+  of 'Cancelative' functors, building upon 'Alternative' applicative functors.
 
 homepage:        https://github.com/emilypi/group-theory
 bug-reports:     https://github.com/emilypi/group-theory/issues
