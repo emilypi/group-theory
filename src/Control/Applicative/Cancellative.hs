@@ -1,7 +1,7 @@
 {-# language DefaultSignatures #-}
 {-# language Safe #-}
 -- |
--- Module       : Control.Applicative.Cancelative
+-- Module       : Control.Applicative.Cancellative
 -- Copyright    : (c) 2020 Emily Pillmore
 -- License      : BSD-style
 --
@@ -11,15 +11,15 @@
 -- Stability    : stable
 -- Portability  : non-portable
 --
--- This module contains definitions for 'Cancelative' functors
+-- This module contains definitions for 'Cancellative' functors
 -- along with the relevant combinators.
 --
-module Control.Applicative.Cancelative
-( -- * Cancelative
-  Cancelative(..)
-  -- ** Cancelative combinators
+module Control.Applicative.Cancellative
+( -- * Cancellative
+  Cancellative(..)
+  -- ** Cancellative combinators
 , cancel1
-, annihalate
+, annihilate
 ) where
 
 
@@ -42,22 +42,22 @@ import Data.Proxy
 -- >>> :set -XFlexibleContexts
 
 -- -------------------------------------------------------------------- --
--- Cancelative functors
+-- Cancellative functors
 
 -- | A group on 'Applicative' functors.
 --
--- 'Cancelative' functors have the following laws:
+-- 'Cancellative' functors have the following laws:
 --
--- [Left Cancelation] @ 'cancel' a '<|>' a = 'empty' @
--- [Rigth Cancelation] @ a '<|>' 'cancel' a = 'empty' @
+-- [Left Cancellation] @ 'cancel' a '<|>' a = 'empty' @
+-- [Rigth Cancellation] @ a '<|>' 'cancel' a = 'empty' @
 --
 -- This is analogous to a group operation on applicative functors,
 -- in the sense that 'Alternative' forms a monoid. A straight-
 -- forward implementation exists whenever @f a@ forms a 'Group'
 -- for all @a@, in which case, @cancel == invert@.
 --
-class Alternative f => Cancelative f where
-  -- | Invert (or 'cancel') a 'Cancelative' functor, such that, if the
+class Alternative f => Cancellative f where
+  -- | Invert (or 'cancel') a 'Cancellative' functor, such that, if the
   -- functor is also a 'Data.Group.Foldable.GroupFoldable', then @'Data.Group.Foldable.gold' '.' 'cancel'@
   -- amounts to evaluating the inverse of a word in the functor.
   --
@@ -72,22 +72,22 @@ class Alternative f => Cancelative f where
   cancel = invert
   {-# minimal cancel #-}
 
-instance Cancelative FG where
+instance Cancellative FG where
   cancel = invert
 
-instance Cancelative FA where
+instance Cancellative FA where
   cancel = invert
 
-instance Cancelative FreeGroup where
+instance Cancellative FreeGroup where
   cancel = invert
 
-instance Cancelative Proxy where
+instance Cancellative Proxy where
   cancel _ = Proxy
 
 -- -------------------------------------------------------------------- --
--- Cancelative functor combinators
+-- Cancellative functor combinators
 
--- | Cancel a single element in a 'Cancelative' functor.
+-- | Cancel a single element in a 'Cancellative' functor.
 --
 -- === __Examples:__
 --
@@ -97,11 +97,11 @@ instance Cancelative Proxy where
 -- >>> gold $ cancel1 (Sum 1) x
 -- Sum {getSum = 0}
 --
-cancel1 :: (Group a, Cancelative f) => a -> f a -> f a
+cancel1 :: (Group a, Cancellative f) => a -> f a -> f a
 cancel1 a f = cancel (pure a) <|> f
 
--- | Annihalate a 'Traversable''s worth of elements in a 'Cancelative'
+-- | Annihalate a 'Traversable''s worth of elements in a 'Cancellative'
 -- functor.
 --
-annihalate :: (Cancelative f, Traversable t) => (a -> f a) -> t a -> f (t a)
-annihalate f = traverse (cancel . f)
+annihilate :: (Cancellative f, Traversable t) => (a -> f a) -> t a -> f (t a)
+annihilate f = traverse (cancel . f)
