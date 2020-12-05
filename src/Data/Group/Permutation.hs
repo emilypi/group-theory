@@ -1,5 +1,6 @@
-{-# language RankNTypes #-}
+{-# language PatternSynonyms #-}
 {-# language Safe #-}
+{-# language ViewPatterns #-}
 -- |
 -- Module       : Data.Group
 -- Copyright    : (c) 2020 Emily Pillmore
@@ -24,6 +25,8 @@ module Data.Group.Permutation
 , ($-)
 , embed
 , retract
+  -- ** Permutation patterns
+, pattern Permute
 ) where
 
 
@@ -101,10 +104,18 @@ embed :: (Group g) => g -> Permutation g
 embed g = Permutation { to = (g <>), from = (invert g <>) }
 
 -- | Get a group element out of the permutation group.
--- This is a left inverse to 'embed', IE:
+-- This is a left inverse to 'embed', i.e.
+--
 -- @
 --    retract . embed = id
 -- @
 --
 retract :: (Group g) => Permutation g -> g
 retract p = p -$ mempty
+
+-- | Bidirectional pattern synonym for embedding/retraction of groups
+-- into their permutation groups.
+--
+pattern Permute :: Group g => Permutation g -> g
+pattern Permute p <- (embed -> p)
+  where Permute p = retract p
