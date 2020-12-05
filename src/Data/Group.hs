@@ -522,9 +522,7 @@ instance Monoid g => Monoid (Abelianizer g) where
 
 instance (Eq g, Group g) => Group (Abelianizer g) where
   invert Quot = Quot
-  invert (Commuted a)
-    | a == mempty = Quot
-    | otherwise = Commuted (invert a)
+  invert (Commuted a) = Commuted (invert a)
 
 -- | Quotient a pair of group elements by their commutator.
 --
