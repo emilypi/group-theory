@@ -2,6 +2,7 @@
 {-# language CPP #-}
 {-# language DerivingStrategies #-}
 {-# language FlexibleInstances #-}
+{-# language PackageImports #-}
 {-# language PatternSynonyms #-}
 {-# language Safe #-}
 #if MIN_VERSION_base(4,12,0)
@@ -23,8 +24,11 @@
 --
 module Data.Group
 ( -- * Groups
-  Group(..)
+  -- $groups
+  G.Group(..)
   -- * Group combinators
+, minus
+, gtimes
 , (><)
   -- ** Conjugation
 , conjugate
@@ -42,32 +46,19 @@ module Data.Group
 , pattern Abelianized
 , pattern Quotiented
   -- * Abelian groups
-, AbelianGroup
+  -- $abelian
+, G.Abelian
 ) where
 
 
 import Data.Bool
-import Data.Functor.Const
-#if __GLASGOW_HASKELL__ > 804
-import Data.Functor.Contravariant
-#endif
-import Data.Functor.Identity
-import Data.Semigroup (stimes)
-import Data.Int
+import "groups" Data.Group as G
 import Data.Monoid
 import Data.Ord
-import Data.Proxy
-import Data.Ratio
-import Data.Word
 
 import Numeric.Natural
 
-#if MIN_VERSION_base(4,12,0)
-import GHC.Generics
-#endif
-
 import Prelude hiding (negate, exponent)
-import qualified Prelude
 
 -- $setup
 --
@@ -81,273 +72,62 @@ import qualified Prelude
 infixr 6 ><
 
 -- -------------------------------------------------------------------- --
--- Groups
-
--- | The typeclass of groups (types with an associative binary operation that
--- has an identity, and all inverses, i.e. a 'Monoid' with all inverses),
--- representing the structural symmetries of a mathematical object.
---
--- Instances should satisfy the following:
---
--- [Right identity] @ x '<>' 'mempty' = x@
--- [Left identity]  @'mempty' '<>' x = x@
--- [Associativity]  @ x '<>' (y '<>' z) = (x '<>' y) '<>' z@
--- [Concatenation]  @ 'mconcat' = 'foldr' ('<>') 'mempty'@
--- [Right inverses] @ x '<>' 'invert' x = 'mempty' @
--- [Left inverses]  @ 'invert' x '<>' x = 'mempty' @
---
--- Some types can be viewed as a group in more than one way,
--- e.g. both addition and multiplication on numbers.
--- In such cases we often define @newtype@s and make those instances
--- of 'Group', e.g. 'Data.Semigroup.Sum' and 'Data.Semigroup.Product'.
--- Often in practice such differences between addition and
--- multiplication-like operations matter (e.g. when defining rings), and
--- so, classes "additive" (the underlying operation is addition-like) and
--- "multiplicative" group classes are provided in vis 'Data.Group.Additive.AdditiveGroup' and
--- 'Data.Group.Multiplicative.MultiplicativeGroup'.
---
--- Categorically, 'Group's may be viewed single-object groupoids.
---
-class Monoid a => Group a where
-  invert :: a -> a
-  invert a = mempty `minus` a
-  {-# inline invert #-}
-
-  -- | Similar to 'stimes' from 'Data.Semigroup', but handles
-  -- negative powers by using 'invert' appropriately.
-  --
-  -- === __Examples:__
-  --
-  -- >>> gtimes 2 (Sum 3)
-  -- Sum {getSum = 6}
-  -- >>> gtimes (-3) (Sum 3)
-  -- Sum {getSum = -9}
-  --
-  gtimes :: (Integral n) => n -> a -> a
-  gtimes n a
-    | n == 0 = mempty
-    | n > 0 = stimes n a
-    | otherwise = stimes (abs n) (invert a)
-  {-# inline gtimes #-}
-
-  -- | 'Group' subtraction.
-  --
-  -- This function denotes principled 'Group' subtraction, where
-  -- @a `minus` b@ translates into @a <> (invert b)@. This is because
-  -- subtraction as an operator is non-associative, but the operation
-  -- described in terms of addition and inversion is.
-  --
-  minus :: a -> a -> a
-  minus a b = a <> invert b
-  {-# inline minus #-}
-  {-# minimal invert | minus #-}
-
-
-instance Group () where
-  invert = id
-  {-# inline invert #-}
-
-instance Group b => Group (a -> b) where
-  invert f = invert . f
-  {-# inline invert #-}
-
-instance Group a => Group (Dual a) where
-  invert (Dual a) = Dual (invert a)
-  {-# inline invert #-}
-
-instance Group a => Group (Down a) where
-  invert (Down a) = Down (invert a)
-  {-# inline invert #-}
-
--- instance Group a => Group (Endo a) where
---  invert (Endo a) = Endo (invert . a)
---  {-# inline invert #-}
-
-#if __GLASGOW_HASKELL__ > 804
-instance Group a => Group (Op a b) where
-  invert (Op f) = Op $ invert . f
-  {-# inline invert #-}
-#endif
-
-instance Group (Sum Integer) where
-  invert = Prelude.negate
-  {-# inline invert #-}
-
-instance Group (Sum Rational) where
-  invert = Prelude.negate
-  {-# inline invert #-}
-
-instance Group (Sum Int) where
-  invert = Prelude.negate
-  {-# inline invert #-}
-
-instance Group (Sum Int8) where
-  invert = Prelude.negate
-  {-# inline invert #-}
-
-instance Group (Sum Int16) where
-  invert = Prelude.negate
-  {-# inline invert #-}
-
-instance Group (Sum Int32) where
-  invert = Prelude.negate
-  {-# inline invert #-}
-
-instance Group (Sum Int64) where
-  invert = Prelude.negate
-  {-# inline invert #-}
-
-instance Group (Sum Word) where
-  invert = Prelude.negate
-  {-# inline invert #-}
-
-instance Group (Sum Word8) where
-  invert = Prelude.negate
-  {-# inline invert #-}
-
-instance Group (Sum Word16) where
-  invert = Prelude.negate
-  {-# inline invert #-}
-
-instance Group (Sum Word32) where
-  invert = Prelude.negate
-  {-# inline invert #-}
-
-instance Group (Sum Word64) where
-  invert = Prelude.negate
-  {-# inline invert #-}
-
-instance Group (Sum (Ratio Int)) where
-  invert = Sum . Prelude.negate . getSum
-  {-# inline invert #-}
-
-instance Group (Sum (Ratio Int8)) where
-  invert = Sum . Prelude.negate . getSum
-  {-# inline invert #-}
-
-instance Group (Sum (Ratio Int16)) where
-  invert = Sum . Prelude.negate . getSum
-  {-# inline invert #-}
-
-instance Group (Sum (Ratio Int32)) where
-  invert = Sum . Prelude.negate . getSum
-  {-# inline invert #-}
-
-instance Group (Sum (Ratio Int64)) where
-  invert = Sum . Prelude.negate . getSum
-  {-# inline invert #-}
-
-instance Group (Sum (Ratio Word)) where
-  invert = Sum . Prelude.negate . getSum
-  {-# inline invert #-}
-
-instance Group (Sum (Ratio Word8)) where
-  invert = Sum . Prelude.negate . getSum
-  {-# inline invert #-}
-
-instance Group (Sum (Ratio Word16)) where
-  invert = Sum . Prelude.negate . getSum
-  {-# inline invert #-}
-
-instance Group (Sum (Ratio Word32)) where
-  invert = Sum . Prelude.negate . getSum
-  {-# inline invert #-}
-
-instance Group (Sum (Ratio Word64)) where
-  invert = Sum . Prelude.negate . getSum
-  {-# inline invert #-}
-
-instance Group (Product Rational) where
-  invert = Product . Prelude.recip . getProduct
-  {-# inline invert #-}
-
-instance Group (Product (Ratio Natural)) where
-  invert = Product . Prelude.recip . getProduct
-  {-# inline invert #-}
-
-instance Group (Product (Ratio Int)) where
-  invert = Product . Prelude.recip . getProduct
-  {-# inline invert #-}
-
-instance Group (Product (Ratio Int8)) where
-  invert = Product . Prelude.recip . getProduct
-  {-# inline invert #-}
-
-instance Group (Product (Ratio Int16)) where
-  invert = Product . Prelude.recip . getProduct
-  {-# inline invert #-}
-
-instance Group (Product (Ratio Int32)) where
-  invert = Product . Prelude.recip . getProduct
-  {-# inline invert #-}
-
-instance Group (Product (Ratio Int64)) where
-  invert = Product . Prelude.recip . getProduct
-  {-# inline invert #-}
-
-instance Group (Product (Ratio Word)) where
-  invert = Product . Prelude.recip . getProduct
-  {-# inline invert #-}
-
-instance Group (Product (Ratio Word8)) where
-  invert = Product . Prelude.recip . getProduct
-  {-# inline invert #-}
-
-instance Group (Product (Ratio Word16)) where
-  invert = Product . Prelude.recip . getProduct
-  {-# inline invert #-}
-
-instance Group (Product (Ratio Word32)) where
-  invert = Product . Prelude.recip . getProduct
-  {-# inline invert #-}
-
-instance Group (Product (Ratio Word64)) where
-  invert = Product . Prelude.recip . getProduct
-  {-# inline invert #-}
-
-instance Group a => Group (Const a b) where
-  invert = Const . invert . getConst
-  {-# inline invert #-}
-
-instance Group a => Group (Identity a) where
-  invert = Identity . invert . runIdentity
-  {-# inline invert #-}
-
-instance Group Ordering where
-  invert LT = GT
-  invert EQ = EQ
-  invert GT = LT
-  {-# inline invert #-}
-
-instance (Group a, Group b) => Group (a,b) where
-  invert ~(a,b) = (invert a, invert b)
-  {-# inline invert #-}
-
-instance Group a => Group (Proxy a) where
-  invert _ = Proxy
-
-instance (Group a, Group b, Group c) => Group (a,b,c) where
-  invert ~(a,b,c) = (invert a, invert b, invert c)
-  {-# inline invert #-}
-
-instance (Group a, Group b, Group c, Group d) => Group (a,b,c,d) where
-  invert ~(a,b,c,d) = (invert a, invert b, invert c, invert d)
-  {-# inline invert #-}
-
-instance (Group a, Group b, Group c, Group d, Group e) => Group (a,b,c,d,e) where
-  invert ~(a,b,c,d,e) = (invert a, invert b, invert c, invert d, invert e)
-  {-# inline invert #-}
-
-#if MIN_VERSION_base(4,12,0)
-instance (Group (f a), Group (g a)) => Group ((f :*: g) a) where
-  invert (f :*: g) = invert f :*: invert g
-
-instance Group (f (g a)) => Group ((f :.: g) a) where
-  invert (Comp1 fg) = invert (Comp1 fg)
-#endif
-
--- -------------------------------------------------------------------- --
 -- Group combinators
+
+{- $groups
+
+The typeclass of groups (types with an associative binary operation that
+has an identity, and all inverses, i.e. a 'Monoid' with all inverses),
+representing the structural symmetries of a mathematical object.
+
+Instances should satisfy the following:
+
+[Right identity] @ x '<>' 'mempty' = x@
+[Left identity]  @'mempty' '<>' x = x@
+[Associativity]  @ x '<>' (y '<>' z) = (x '<>' y) '<>' z@
+[Concatenation]  @ 'mconcat' = 'foldr' ('<>') 'mempty'@
+[Right inverses] @ x '<>' 'invert' x = 'mempty' @
+[Left inverses]  @ 'invert' x '<>' x = 'mempty' @
+
+Some types can be viewed as a group in more than one way,
+e.g. both addition and multiplication on numbers.
+In such cases we often define @newtype@s and make those instances
+of 'Group', e.g. 'Data.Semigroup.Sum' and 'Data.Semigroup.Product'.
+Often in practice such differences between addition and
+multiplication-like operations matter (e.g. when defining rings), and
+so, classes "additive" (the underlying operation is addition-like) and
+"multiplicative" group classes are provided in vis 'Data.Group.Additive.AdditiveGroup' and
+'Data.Group.Multiplicative.MultiplicativeGroup'.
+
+Categorically, 'Group's may be viewed single-object groupoids.
+-}
+
+-- | An alias to 'pow'.
+--
+-- Similar to 'stimes' from 'Data.Semigroup', but handles
+-- negative powers by using 'invert' appropriately.
+--
+-- === __Examples:__
+--
+-- >>> gtimes 2 (Sum 3)
+-- Sum {getSum = 6}
+-- >>> gtimes (-3) (Sum 3)
+-- Sum {getSum = -9}
+--
+gtimes :: (Group a, Integral n) => n -> a -> a
+gtimes = flip pow
+{-# inline gtimes #-}
+
+-- | 'Group' subtraction.
+--
+-- This function denotes principled 'Group' subtraction, where
+-- @a `minus` b@ translates into @a <> invert b@. This is because
+-- subtraction as an operator is non-associative, but the operation
+-- described in terms of addition and inversion is.
+--
+minus :: Group a => a -> a -> a
+minus a b = a <> invert b
+{-# inline minus #-}
 
 -- | Apply @('<>')@, commuting its arguments. When the group is abelian,
 -- @a <> b@ is identically @b <> a@.
@@ -355,6 +135,9 @@ instance Group (f (g a)) => Group ((f :.: g) a) where
 (><) :: Group a => a -> a -> a
 a >< b = b <> a
 {-# inline (><) #-}
+
+-- -------------------------------------------------------------------- --
+-- Group conjugation
 
 -- | Conjugate an element of a group by another element.
 -- When the group is abelian, conjugation is the identity.
@@ -529,71 +312,10 @@ pattern Quotiented <- (uncurry abelianize -> Quot)
 -- -------------------------------------------------------------------- --
 -- Abelian (commutative) groups
 
--- | Commutative 'Group's.
---
--- Instances of 'AbelianGroup' satisfy the following laws:
---
--- [Commutativity] @x <> y = y <> x@
---
-class Group a => AbelianGroup a
-instance AbelianGroup ()
-instance AbelianGroup b => AbelianGroup (a -> b)
-instance AbelianGroup a => AbelianGroup (Dual a)
+{- $abelian
+Commutative 'Group's.
 
-instance AbelianGroup (Sum Integer)
-instance AbelianGroup (Sum Int)
-instance AbelianGroup (Sum Int8)
-instance AbelianGroup (Sum Int16)
-instance AbelianGroup (Sum Int32)
-instance AbelianGroup (Sum Int64)
-instance AbelianGroup (Sum Word)
-instance AbelianGroup (Sum Word8)
-instance AbelianGroup (Sum Word16)
-instance AbelianGroup (Sum Word32)
-instance AbelianGroup (Sum Word64)
-instance AbelianGroup (Sum (Ratio Integer))
-instance AbelianGroup (Sum (Ratio Int))
-instance AbelianGroup (Sum (Ratio Int8))
-instance AbelianGroup (Sum (Ratio Int16))
-instance AbelianGroup (Sum (Ratio Int32))
-instance AbelianGroup (Sum (Ratio Int64))
-instance AbelianGroup (Sum (Ratio Word))
-instance AbelianGroup (Sum (Ratio Word8))
-instance AbelianGroup (Sum (Ratio Word16))
-instance AbelianGroup (Sum (Ratio Word32))
-instance AbelianGroup (Sum (Ratio Word64))
-instance AbelianGroup (Product (Ratio Integer))
-instance AbelianGroup (Product (Ratio Int))
-instance AbelianGroup (Product (Ratio Int8))
-instance AbelianGroup (Product (Ratio Int16))
-instance AbelianGroup (Product (Ratio Int32))
-instance AbelianGroup (Product (Ratio Int64))
-instance AbelianGroup (Product (Ratio Word))
-instance AbelianGroup (Product (Ratio Word8))
-instance AbelianGroup (Product (Ratio Word16))
-instance AbelianGroup (Product (Ratio Word32))
-instance AbelianGroup (Product (Ratio Word64))
-instance AbelianGroup (Product (Ratio Natural))
-instance AbelianGroup a => AbelianGroup (Const a b)
-instance AbelianGroup a => AbelianGroup (Identity a)
-instance AbelianGroup a => AbelianGroup (Proxy a)
-instance AbelianGroup Ordering
-instance (AbelianGroup a, AbelianGroup b) => AbelianGroup (a,b)
-instance (AbelianGroup a, AbelianGroup b, AbelianGroup c) => AbelianGroup (a,b,c)
-instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d) => AbelianGroup (a,b,c,d)
-instance (AbelianGroup a, AbelianGroup b, AbelianGroup c, AbelianGroup d, AbelianGroup e) => AbelianGroup (a,b,c,d,e)
-instance AbelianGroup a => AbelianGroup (Down a)
--- instance AbelianGroup a => AbelianGroup (Endo a)
-#if MIN_VERSION_base(4,12,0)
-instance (AbelianGroup (f a), AbelianGroup (g a)) => AbelianGroup ((f :*: g) a)
-instance AbelianGroup (f (g a)) => AbelianGroup ((f :.: g) a)
-#endif
+Instances of 'Abelian' satisfy the following laws:
 
-#if __GLASGOW_HASKELL__ > 804
--- instance AbelianGroup (Equivalence a)
--- instance AbelianGroup (Comparison a)
--- instance AbelianGroup (Predicate a)
-instance AbelianGroup a => AbelianGroup (Op a b)
-#endif
-
-instance (Eq a, AbelianGroup a) => AbelianGroup (Abelianizer a)
+[Commutativity] @x <> y = y <> x@
+-}

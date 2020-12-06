@@ -1,5 +1,6 @@
 {-# language CPP #-}
 {-# language FlexibleInstances #-}
+{-# language PackageImports #-}
 {-# language Safe #-}
 -- |
 -- Module       : Data.Group.Additive
@@ -34,8 +35,8 @@ import Data.Functor.Contravariant
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
+import "groups" Data.Group as G
 import Data.Int
-import Data.Ord
 import Data.Proxy
 import Data.Ratio
 import Data.Semigroup
@@ -67,7 +68,6 @@ class Group g => AdditiveGroup g where
 instance AdditiveGroup ()
 instance AdditiveGroup b => AdditiveGroup (a -> b)
 instance AdditiveGroup a => AdditiveGroup (Dual a)
-instance AdditiveGroup a => AdditiveGroup (Down a)
 instance AdditiveGroup (Sum Integer)
 instance AdditiveGroup (Sum Int)
 instance AdditiveGroup (Sum Int8)
@@ -97,7 +97,6 @@ instance (AdditiveGroup a, AdditiveGroup b, AdditiveGroup c, AdditiveGroup d, Ad
 instance AdditiveGroup a => AdditiveGroup (Const a b)
 instance AdditiveGroup a => AdditiveGroup (Identity a)
 instance AdditiveGroup a => AdditiveGroup (Proxy a)
--- instance AdditiveGroup a => AdditiveGroup (Endo a)
 #if __GLASGOW_HASKELL__ > 804
 instance AdditiveGroup a => AdditiveGroup (Op a b)
 #endif
@@ -159,7 +158,7 @@ copower = gtimes
 -- | An additive abelian group is an 'AbelianGroup' whose operation can be thought of
 -- as commutative addition in some sense. Almost all additive groups are abelian.
 --
-class (AbelianGroup g, AdditiveGroup g) => AdditiveAbelianGroup g
+class (G.Abelian g, AdditiveGroup g) => AdditiveAbelianGroup g
 instance AdditiveAbelianGroup ()
 instance AdditiveAbelianGroup b => AdditiveAbelianGroup (a -> b)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Dual a)
@@ -192,8 +191,6 @@ instance (AdditiveAbelianGroup a, AdditiveAbelianGroup b, AdditiveAbelianGroup c
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Const a b)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Identity a)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Proxy a)
-instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Down a)
--- instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Endo a)
 #if __GLASGOW_HASKELL__ > 804
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Op a b)
 #endif

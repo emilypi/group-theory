@@ -27,13 +27,11 @@ module Data.Group.Finite
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
-import Data.Int
 import Data.Monoid
 #if __GLASGOW_HASKELL__ >= 810
 import Data.Ord
 #endif
 import Data.Proxy
-import Data.Word
 
 -- $setup
 --
@@ -65,21 +63,7 @@ instance (FiniteGroup a, FiniteGroup b) => FiniteGroup (a,b)
 instance (FiniteGroup a, FiniteGroup b, FiniteGroup c) => FiniteGroup (a,b,c)
 instance (FiniteGroup a, FiniteGroup b, FiniteGroup c, FiniteGroup d) => FiniteGroup (a,b,c,d)
 instance (FiniteGroup a, FiniteGroup b, FiniteGroup c, FiniteGroup d, FiniteGroup e) => FiniteGroup (a,b,c,d,e)
-instance FiniteGroup (Sum Int)
-instance FiniteGroup (Sum Int8)
-instance FiniteGroup (Sum Int16)
-instance FiniteGroup (Sum Int32)
-instance FiniteGroup (Sum Int64)
-instance FiniteGroup (Sum Word)
-instance FiniteGroup (Sum Word8)
-instance FiniteGroup (Sum Word16)
-instance FiniteGroup (Sum Word32)
-instance FiniteGroup (Sum Word64)
-instance FiniteGroup Ordering
-
-#if __GLASGOW_HASKELL__ >= 810
-instance FiniteGroup a => FiniteGroup (Down a)
-#endif
+instance (Bounded a, Num a) => FiniteGroup (Sum a)
 
 -- -------------------------------------------------------------------- --
 -- Finite group combinators
@@ -106,16 +90,7 @@ class FiniteGroup g => FiniteAbelianGroup g
 
 instance FiniteAbelianGroup ()
 instance FiniteAbelianGroup a => FiniteAbelianGroup (Dual a)
-instance FiniteAbelianGroup (Sum Int)
-instance FiniteAbelianGroup (Sum Int8)
-instance FiniteAbelianGroup (Sum Int16)
-instance FiniteAbelianGroup (Sum Int32)
-instance FiniteAbelianGroup (Sum Int64)
-instance FiniteAbelianGroup (Sum Word)
-instance FiniteAbelianGroup (Sum Word8)
-instance FiniteAbelianGroup (Sum Word16)
-instance FiniteAbelianGroup (Sum Word32)
-instance FiniteAbelianGroup (Sum Word64)
+instance (Num a, Bounded a) => FiniteAbelianGroup (Sum a)
 instance FiniteAbelianGroup a => FiniteAbelianGroup (Const a b)
 instance FiniteAbelianGroup a => FiniteAbelianGroup (Identity a)
 instance FiniteAbelianGroup a => FiniteAbelianGroup (Proxy a)
@@ -123,8 +98,3 @@ instance (FiniteAbelianGroup a, FiniteAbelianGroup b) => FiniteAbelianGroup (a,b
 instance (FiniteAbelianGroup a, FiniteAbelianGroup b, FiniteAbelianGroup c) => FiniteAbelianGroup (a,b,c)
 instance (FiniteAbelianGroup a, FiniteAbelianGroup b, FiniteAbelianGroup c, FiniteAbelianGroup d) => FiniteAbelianGroup (a,b,c,d)
 instance (FiniteAbelianGroup a, FiniteAbelianGroup b, FiniteAbelianGroup c, FiniteAbelianGroup d, FiniteAbelianGroup e) => FiniteAbelianGroup (a,b,c,d,e)
-instance FiniteAbelianGroup Ordering
-
-#if __GLASGOW_HASKELL__ >= 810
-instance FiniteAbelianGroup a => FiniteAbelianGroup (Down a)
-#endif
