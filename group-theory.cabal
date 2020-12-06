@@ -6,6 +6,18 @@ description:
   This package includes definitions for Groups (monoids with invertibility), including
   finite, fre, simple, cyclic, and permutation groups. Additionally, we add the concept
   of 'Cancellative' functors, building upon 'Alternative' applicative functors.
+  .
+  There is plenty of other group theory related packages on Hackage:
+  .
+  * [groups](https://hackage.haskell.org/package/groups): minimal definition and lots of good instances.
+  .
+  * [magmas](https://hackage.haskell.org/package/magmas): good pedagogy
+  .
+  * [monoids](https://hackage.haskell.org/package/monoids): deprecated in favor of [reducers](https://hackage.haskell.org/package/reducers), which don't have @Data.Group@
+  .
+  * [arithmoi](https://hackage.haskell.org/package/arithmoi): Have cyclic groups, but also much more numerics
+  .
+  @group-theory@ tries to combine the best parts.
 
 homepage:        https://github.com/emilypi/group-theory
 bug-reports:     https://github.com/emilypi/group-theory/issues
