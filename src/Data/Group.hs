@@ -426,12 +426,12 @@ pattern Conjugate t <- (\(g,a) -> (g, conjugate g a) -> t) where
 
 -- | Bidirectional pattern for inverse elements.
 pattern Inverse :: (Group g) => g -> g
-pattern Inverse t <- (\g -> invert g -> t) where
+pattern Inverse t <- (invert -> t) where
     Inverse g = invert g
 
 -- | Bidirectional pattern for the identity element.
 pattern IdentityElem :: (Eq m, Monoid m) => m
-pattern IdentityElem <- (\m -> if m == mempty then Just m else Nothing -> Just t) where
+pattern IdentityElem <- ((== mempty) -> True) where
   IdentityElem = mempty
 
 -- -------------------------------------------------------------------- --
