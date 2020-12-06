@@ -80,9 +80,6 @@ instance Cancellative FA where
 
 instance Cancellative FreeGroup where
   cancel = invert
-    . FreeGroup
-    . reverse
-    . runFreeGroup
 
 instance Cancellative Proxy where
   cancel _ = Proxy

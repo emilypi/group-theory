@@ -67,11 +67,10 @@ instance Monoid (FreeGroup a) where
     mempty = FreeGroup []
 
 instance Group (FreeGroup a) where
-    invert (FreeGroup g) = FreeGroup $ fmap inv g
-        where
-          inv :: Either a a -> Either a a
-          inv (Left a) = Right a
-          inv (Right a) = Left a
+    invert = FreeGroup
+      . fmap (either Right Left)
+      . reverse
+      . runFreeGroup
 
 instance Functor FreeGroup where
     fmap f (FreeGroup g) = FreeGroup $ fmap (bimap f f) g
@@ -84,7 +83,7 @@ instance Monad FreeGroup where
     return = pure
     (FreeGroup g) >>= f = FreeGroup $ concatMap go g
         where
-          go (Left a)  = runFreeGroup $ invert $ f a
+          go (Left a)  = runFreeGroup $ invert (f a)
           go (Right a) = runFreeGroup $ f a
 
 instance Alternative FreeGroup where
