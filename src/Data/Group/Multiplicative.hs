@@ -1,3 +1,4 @@
+{-# language CPP #-}
 {-# language FlexibleInstances #-}
 {-# language Safe #-}
 -- |
@@ -62,7 +63,6 @@ class Group g => MultiplicativeGroup g
 
 instance MultiplicativeGroup ()
 instance MultiplicativeGroup b => MultiplicativeGroup (a -> b)
-instance (Applicative f, MultiplicativeGroup a) => MultiplicativeGroup (Ap f a)
 instance MultiplicativeGroup a => MultiplicativeGroup (Dual a)
 instance MultiplicativeGroup (Product (Ratio Integer))
 instance MultiplicativeGroup (Product (Ratio Natural))
@@ -83,6 +83,9 @@ instance (MultiplicativeGroup a, MultiplicativeGroup b, MultiplicativeGroup c, M
 instance MultiplicativeGroup a => MultiplicativeGroup (Const a b)
 instance MultiplicativeGroup a => MultiplicativeGroup (Identity a)
 instance MultiplicativeGroup a => MultiplicativeGroup (Proxy a)
+#if MIN_VERSION_base(4,12,0)
+instance (Applicative f, MultiplicativeGroup a) => MultiplicativeGroup (Ap f a)
+#endif
 
 -- | Infix alias for multiplicative inverse.
 --

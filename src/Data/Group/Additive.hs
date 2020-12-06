@@ -66,7 +66,6 @@ class Group g => AdditiveGroup g where
 
 instance AdditiveGroup ()
 instance AdditiveGroup b => AdditiveGroup (a -> b)
-instance (Applicative f, AdditiveGroup a) => AdditiveGroup (Ap f a)
 instance AdditiveGroup a => AdditiveGroup (Dual a)
 instance AdditiveGroup a => AdditiveGroup (Down a)
 instance AdditiveGroup (Sum Integer)
@@ -99,6 +98,9 @@ instance AdditiveGroup a => AdditiveGroup (Const a b)
 instance AdditiveGroup a => AdditiveGroup (Identity a)
 instance AdditiveGroup a => AdditiveGroup (Proxy a)
 -- instance AdditiveGroup a => AdditiveGroup (Endo a)
+#if MIN_VERSION_base(4,12,0)
+instance (Applicative f, AdditiveGroup a) => AdditiveGroup (Ap f a)
+#endif
 #if __GLASGOW_HASKELL__ > 804
 instance AdditiveGroup a => AdditiveGroup (Op a b)
 #endif
