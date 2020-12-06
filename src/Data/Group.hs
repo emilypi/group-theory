@@ -159,7 +159,7 @@ instance Group a => Group (Down a) where
   invert (Down a) = Down (invert a)
   {-# inline invert #-}
 
--- nstance Group a => Group (Endo a) where
+-- instance Group a => Group (Endo a) where
 --  invert (Endo a) = Endo (invert . a)
 --  {-# inline invert #-}
 
