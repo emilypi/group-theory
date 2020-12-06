@@ -30,9 +30,9 @@ import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
 import Data.Int
+import Data.Monoid
 import Data.Proxy
 import Data.Ratio
-import Data.Semigroup
 import Data.Word
 
 import Numeric.Natural
@@ -62,6 +62,7 @@ class Group g => MultiplicativeGroup g
 
 instance MultiplicativeGroup ()
 instance MultiplicativeGroup b => MultiplicativeGroup (a -> b)
+instance (Applicative f, MultiplicativeGroup a) => MultiplicativeGroup (Ap f a)
 instance MultiplicativeGroup a => MultiplicativeGroup (Dual a)
 instance MultiplicativeGroup (Product (Ratio Integer))
 instance MultiplicativeGroup (Product (Ratio Natural))

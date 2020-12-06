@@ -35,10 +35,10 @@ import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
 import Data.Int
+import Data.Monoid
 import Data.Ord
 import Data.Proxy
 import Data.Ratio
-import Data.Semigroup
 import Data.Word
 
 import Prelude hiding ((-), (+))
@@ -66,6 +66,7 @@ class Group g => AdditiveGroup g where
 
 instance AdditiveGroup ()
 instance AdditiveGroup b => AdditiveGroup (a -> b)
+instance (Applicative f, AdditiveGroup a) => AdditiveGroup (Ap f a)
 instance AdditiveGroup a => AdditiveGroup (Dual a)
 instance AdditiveGroup a => AdditiveGroup (Down a)
 instance AdditiveGroup (Sum Integer)

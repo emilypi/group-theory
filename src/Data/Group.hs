@@ -151,6 +151,9 @@ instance Group b => Group (a -> b) where
   invert f = invert . f
   {-# inline invert #-}
 
+instance (Applicative f, Group a) => Group (Ap f a) where
+  invert (Ap fa) = Ap (invert <$> fa)
+
 instance Group a => Group (Dual a) where
   invert (Dual a) = Dual (invert a)
   {-# inline invert #-}
@@ -538,6 +541,7 @@ pattern Quotiented <- (uncurry abelianize -> Quot)
 class Group a => AbelianGroup a
 instance AbelianGroup ()
 instance AbelianGroup b => AbelianGroup (a -> b)
+instance (Applicative f, AbelianGroup a) => AbelianGroup (Ap f a)
 instance AbelianGroup a => AbelianGroup (Dual a)
 
 instance AbelianGroup (Sum Integer)
