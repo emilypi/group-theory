@@ -21,12 +21,15 @@ module Data.Group.Free.Product
 import Data.Bifunctor
 import Data.Group
 
+import Data.Sequence (Seq(..))
+import qualified Data.Sequence as Seq
+
 
 -- | The free product of two 'Group's.
 --
 -- __Note:__ This does nto perform simplification upon multiplication or construction.
 -- To do this, one should use 'simplify'.
-newtype FreeProduct g h = FreeProduct { runFreeProduct :: [Either g h] }
+newtype FreeProduct g h = FreeProduct { runFreeProduct :: Seq (Either g h) }
     deriving (Show, Eq, Ord)
 
 instance Functor (FreeProduct g) where
@@ -40,21 +43,27 @@ instance Bifunctor (FreeProduct) where
 simplify :: (Eq g, Eq h, Monoid g, Monoid h) => FreeProduct g h -> FreeProduct g h
 simplify (FreeProduct fp) = FreeProduct $ go fp
     where
-      go (Left IdentityElem : ghs) = go ghs
-      go (Right IdentityElem : ghs) = go ghs
-      go (Left g : Left g' : ghs) = go $ (Left $ g <> g') : ghs
-      go (Right h : Right h' : ghs) = go $ (Right $ h <> h') : ghs
-      go (gh : ghs) = gh : go ghs
+      go (Left IdentityElem :<| ghs) = go ghs
+      go (Right IdentityElem :<| ghs) = go ghs
+      go (Left g :<| Left g' :<| ghs) = go $ (Left $ g <> g') :<| ghs
+      go (Right h :<| Right h' :<| ghs) = go $ (Right $ h <> h') :<| ghs
+      go (gh :<| ghs) = gh :<| go ghs
 
 instance Semigroup (FreeProduct g h) where
     (FreeProduct ghs) <> (FreeProduct ghs') = FreeProduct $ ghs <> ghs'
 
 instance Monoid (FreeProduct g h) where
-    mempty = FreeProduct []
+    mempty = FreeProduct Seq.empty
 
 instance (Group g, Group h) => Group (FreeProduct g h) where
-    invert (FreeProduct ghs) = FreeProduct (fmap (bimap invert invert) $ reverse ghs)
+    invert (FreeProduct ghs) = FreeProduct (fmap (bimap invert invert) $ Seq.reverse ghs)
+
+injl :: a -> FreeProduct a b
+injl a = FreeProduct $ Seq.singleton $ (Left a)
+
+injr :: b -> FreeProduct a b
+injr b = FreeProduct $ Seq.singleton $ (Right b)
 
 -- | The 'FreeProduct' of two 'Monoid's is a coproduct in the category of monoids (and by extension, the category of groups).
 coproduct :: (Monoid m) => (a -> m) -> (b -> m) -> FreeProduct a b -> m
-coproduct gi hi (FreeProduct ghs) = mconcat $ fmap (either gi hi) ghs
+coproduct gi hi (FreeProduct ghs) = foldMap (either gi hi) ghs
