@@ -20,6 +20,7 @@ module Data.Group.Cyclic
   G.Cyclic(..)
   -- ** Combinators
 , classify
+, G.generated
 ) where
 
 import "groups" Data.Group as G
@@ -30,6 +31,7 @@ import "groups" Data.Group as G
 -- >>> import Data.Group
 -- >>> import Data.Monoid
 -- >>> import Data.Semigroup
+-- >>> import Data.Word
 -- >>> :set -XTypeApplications
 
 -- -------------------------------------------------------------------- --
@@ -42,6 +44,7 @@ This element is called a /generator/ of the group. There can be many
 generators for a group, e.g., any representative of an equivalence
 class of prime numbers of the integers modulo @n@, but to make things
 easy, we ask for only one generator.
+
 -}
 
 -- | Classify elements of a 'CyclicGroup'.
@@ -51,8 +54,8 @@ easy, we ask for only one generator.
 --
 -- === __Examples__:
 --
--- >>> classify (< (3 :: Sum Word8))
--- [Sum {getSum = 1},Sum {getSum = 2}]
+-- >>> take 3 $ classify (< (3 :: Sum Word8))
+-- [Sum {getSum = 0},Sum {getSum = 1},Sum {getSum = 2}]
 --
 classify :: (Eq a, G.Cyclic a) => (a -> Bool) -> [a]
 classify p = filter p G.generated

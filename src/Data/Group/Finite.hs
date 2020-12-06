@@ -28,9 +28,6 @@ import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
 import Data.Monoid
-#if __GLASGOW_HASKELL__ >= 810
-import Data.Ord
-#endif
 import Data.Proxy
 
 -- $setup
@@ -39,6 +36,7 @@ import Data.Proxy
 -- >>> import Data.Group
 -- >>> import Data.Monoid
 -- >>> import Data.Semigroup
+-- >>> import Data.Word
 -- >>> :set -XTypeApplications
 
 -- -------------------------------------------------------------------- --

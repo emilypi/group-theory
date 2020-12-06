@@ -66,6 +66,7 @@ import Prelude hiding (negate, exponent)
 -- >>> import Data.Group
 -- >>> import Data.Monoid
 -- >>> import Data.Semigroup
+-- >>> import Data.Word
 -- >>> :set -XTypeApplications
 -- >>> :set -XFlexibleContexts
 
