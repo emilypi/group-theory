@@ -145,9 +145,9 @@ instance CyclicGroup a => CyclicGroup (Down a) where
   generator = Down generator
   {-# inline generator #-}
 
-instance CyclicGroup a => CyclicGroup (Endo a) where
-  generator = Endo $ const generator
-  {-# inline generator #-}
+-- instance CyclicGroup a => CyclicGroup (Endo a) where
+--   generator = Endo $ const generator
+--   {-# inline generator #-}
 
 -- -------------------------------------------------------------------- --
 -- Cyclic group combinators

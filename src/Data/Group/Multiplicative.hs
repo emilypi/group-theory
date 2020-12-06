@@ -63,7 +63,6 @@ class Group g => MultiplicativeGroup g
 instance MultiplicativeGroup ()
 instance MultiplicativeGroup b => MultiplicativeGroup (a -> b)
 instance MultiplicativeGroup a => MultiplicativeGroup (Dual a)
-instance MultiplicativeGroup All
 instance MultiplicativeGroup (Product (Ratio Integer))
 instance MultiplicativeGroup (Product (Ratio Natural))
 instance MultiplicativeGroup (Product (Ratio Int))
@@ -146,7 +145,6 @@ class (MultiplicativeGroup g, AbelianGroup g) => MultiplicativeAbelianGroup g
 instance MultiplicativeAbelianGroup ()
 instance MultiplicativeAbelianGroup b => MultiplicativeAbelianGroup (a -> b)
 instance MultiplicativeAbelianGroup a => MultiplicativeAbelianGroup (Dual a)
-instance MultiplicativeAbelianGroup All
 instance MultiplicativeAbelianGroup (Product (Ratio Integer))
 instance MultiplicativeAbelianGroup (Product (Ratio Natural))
 instance MultiplicativeAbelianGroup (Product (Ratio Int))

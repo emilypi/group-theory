@@ -65,7 +65,7 @@ class Alternative f => Cancellative f where
   --
   -- >>> let x = FreeGroup [Left (Sum (2 :: Word8)), Right (Sum 3)]
   -- >>> cancel x
-  -- FreeGroup {runFreeGroup = [Right (Sum {getSum = 2}),Left (Sum {getSum = 3})]}
+  -- FreeGroup {runFreeGroup = [Left (Sum {getSum = 3}),Right (Sum {getSum = 2})]}
   --
   cancel :: f a -> f a
   default cancel :: Group (f a) => f a -> f a
@@ -80,6 +80,9 @@ instance Cancellative FA where
 
 instance Cancellative FreeGroup where
   cancel = invert
+    . FreeGroup
+    . reverse
+    . runFreeGroup
 
 instance Cancellative Proxy where
   cancel _ = Proxy
@@ -100,7 +103,7 @@ instance Cancellative Proxy where
 cancel1 :: (Group a, Cancellative f) => a -> f a -> f a
 cancel1 a f = cancel (pure a) <|> f
 
--- | Annihalate a 'Traversable''s worth of elements in a 'Cancellative'
+-- | Annihalate a 'Traversable'\'s worth of elements in a 'Cancellative'
 -- functor.
 --
 annihilate :: (Cancellative f, Traversable t) => (a -> f a) -> t a -> f (t a)
