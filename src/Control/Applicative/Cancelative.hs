@@ -103,7 +103,7 @@ instance Cancelative Proxy where
 cancel1 :: (Group a, Cancelative f) => a -> f a -> f a
 cancel1 a f = cancel (pure a) <|> f
 
--- | Annihalate a 'Traversable''s worth of elements in a 'Cancelative'
+-- | Annihalate a 'Traversable's worth of elements in a 'Cancelative'
 -- functor.
 --
 annihalate :: (Cancelative f, Traversable t) => (a -> f a) -> t a -> f (t a)

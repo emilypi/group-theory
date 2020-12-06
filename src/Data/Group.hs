@@ -164,18 +164,6 @@ instance Group a => Group (Down a) where
 --  {-# inline invert #-}
 
 #if __GLASGOW_HASKELL__ > 804
-instance Group (Equivalence a) where
-  invert (Equivalence p) = Equivalence $ \a b -> not (p a b)
-  {-# inline invert #-}
-
-instance Group (Comparison a) where
-  invert (Comparison p) = Comparison $ \a b -> invert (p a b)
-  {-# inline invert #-}
-
-instance Group (Predicate a) where
-  invert (Predicate p) = Predicate $ \a -> not (p a)
-  {-# inline invert #-}
-
 instance Group a => Group (Op a b) where
   invert (Op f) = Op $ invert . f
   {-# inline invert #-}
@@ -602,9 +590,9 @@ instance AbelianGroup (f (g a)) => AbelianGroup ((f :.: g) a)
 #endif
 
 #if __GLASGOW_HASKELL__ > 804
-instance AbelianGroup (Equivalence a)
-instance AbelianGroup (Comparison a)
-instance AbelianGroup (Predicate a)
+-- instance AbelianGroup (Equivalence a)
+-- instance AbelianGroup (Comparison a)
+-- instance AbelianGroup (Predicate a)
 instance AbelianGroup a => AbelianGroup (Op a b)
 #endif
 
