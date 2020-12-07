@@ -21,7 +21,6 @@ module Data.Group.Cyclic
   -- ** Combinators
 , classify
 , G.generated
-, G.generated'
 ) where
 
 import "groups" Data.Group as G
@@ -37,6 +36,7 @@ import "groups" Data.Group as G
 
 -- -------------------------------------------------------------------- --
 -- Cyclic groups
+
 
 {- $cyclic
 
@@ -59,5 +59,5 @@ easy, we ask for only one generator.
 -- [Sum {getSum = 0},Sum {getSum = 1},Sum {getSum = 2}]
 --
 classify :: (Eq a, G.Cyclic a) => (a -> Bool) -> [a]
-classify p = filter p G.generated'
+classify p = filter p (mempty : G.generated')
 {-# inline classify #-}
