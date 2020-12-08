@@ -1,6 +1,6 @@
 {-# language Safe #-}
 -- |
--- Module       : Data.Group
+-- Module       : Data.Group.Free
 -- Copyright    : (c) 2020 Reed Mullanix, Emily Pillmore
 -- License      : BSD-style
 --
