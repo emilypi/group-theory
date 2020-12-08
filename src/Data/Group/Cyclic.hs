@@ -56,8 +56,8 @@ easy, we ask for only one generator.
 -- === __Examples__:
 --
 -- >>> take 3 $ classify (< (3 :: Sum Word8))
--- [Sum {getSum = 0},Sum {getSum = 1},Sum {getSum = 2}]
+-- [Sum {getSum = 1},Sum {getSum = 2}]
 --
 classify :: (Eq a, G.Cyclic a) => (a -> Bool) -> [a]
-classify p = filter p (mempty : G.generated')
+classify p = filter p G.generated'
 {-# inline classify #-}
