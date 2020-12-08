@@ -30,6 +30,9 @@ module Data.Group
 , conjugate
 , unconjugate
 , pattern Conjugate
+  -- ** Elements
+, pattern Inverse
+, pattern IdentityElem
   -- ** Order
 , Order(..)
 , pattern Infinitary
@@ -396,6 +399,16 @@ pattern Conjugate :: Group a => (a,a) -> (a,a)
 pattern Conjugate t <- (\(g,a) -> (g, conjugate g a) -> t) where
   Conjugate (g,a) = (g, unconjugate g a)
 {-# complete Conjugate #-}
+
+-- | Bidirectional pattern for inverse elements.
+pattern Inverse :: (Group g) => g -> g
+pattern Inverse t <- (invert -> t) where
+    Inverse g = invert g
+
+-- | Bidirectional pattern for the identity element.
+pattern IdentityElem :: (Eq m, Monoid m) => m
+pattern IdentityElem <- ((== mempty) -> True) where
+  IdentityElem = mempty
 
 -- -------------------------------------------------------------------- --
 -- Group order
