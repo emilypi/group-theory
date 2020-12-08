@@ -64,7 +64,7 @@ instance Monoid a => Monoid (Permutation a) where
 instance Group a => Group (Permutation a) where
   invert (Permutation t f) = Permutation (f . t) (t . f)
 
-instance AbelianGroup a => AbelianGroup (Permutation a)
+instance Abelian a => Abelian (Permutation a)
 instance AdditiveGroup a => AdditiveGroup (Permutation a)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Permutation a)
 instance MultiplicativeGroup a => MultiplicativeGroup (Permutation a)

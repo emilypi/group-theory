@@ -1,4 +1,5 @@
 {-# language FlexibleInstances #-}
+{-# language PackageImports #-}
 {-# language Safe #-}
 -- |
 -- Module       : Data.Group.Multiplicative
@@ -29,13 +30,8 @@ module Data.Group.Multiplicative
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
-import Data.Int
 import Data.Proxy
-import Data.Ratio
 import Data.Semigroup
-import Data.Word
-
-import Numeric.Natural
 
 import Prelude hiding ((^), (/), (*))
 
@@ -63,18 +59,7 @@ class Group g => MultiplicativeGroup g
 instance MultiplicativeGroup ()
 instance MultiplicativeGroup b => MultiplicativeGroup (a -> b)
 instance MultiplicativeGroup a => MultiplicativeGroup (Dual a)
-instance MultiplicativeGroup (Product (Ratio Integer))
-instance MultiplicativeGroup (Product (Ratio Natural))
-instance MultiplicativeGroup (Product (Ratio Int))
-instance MultiplicativeGroup (Product (Ratio Int8))
-instance MultiplicativeGroup (Product (Ratio Int16))
-instance MultiplicativeGroup (Product (Ratio Int32))
-instance MultiplicativeGroup (Product (Ratio Int64))
-instance MultiplicativeGroup (Product (Ratio Word))
-instance MultiplicativeGroup (Product (Ratio Word8))
-instance MultiplicativeGroup (Product (Ratio Word16))
-instance MultiplicativeGroup (Product (Ratio Word32))
-instance MultiplicativeGroup (Product (Ratio Word64))
+instance Fractional a => MultiplicativeGroup (Product a)
 instance (MultiplicativeGroup a, MultiplicativeGroup b) => MultiplicativeGroup (a,b)
 instance (MultiplicativeGroup a, MultiplicativeGroup b, MultiplicativeGroup c) => MultiplicativeGroup (a,b,c)
 instance (MultiplicativeGroup a, MultiplicativeGroup b, MultiplicativeGroup c, MultiplicativeGroup d) => MultiplicativeGroup (a,b,c,d)
@@ -141,22 +126,11 @@ power a n = gtimes n a
 -- as commutative multiplication in some sense. Almost all multiplicative groups
 -- are abelian.
 --
-class (MultiplicativeGroup g, AbelianGroup g) => MultiplicativeAbelianGroup g
+class (MultiplicativeGroup g, Abelian g) => MultiplicativeAbelianGroup g
 instance MultiplicativeAbelianGroup ()
 instance MultiplicativeAbelianGroup b => MultiplicativeAbelianGroup (a -> b)
 instance MultiplicativeAbelianGroup a => MultiplicativeAbelianGroup (Dual a)
-instance MultiplicativeAbelianGroup (Product (Ratio Integer))
-instance MultiplicativeAbelianGroup (Product (Ratio Natural))
-instance MultiplicativeAbelianGroup (Product (Ratio Int))
-instance MultiplicativeAbelianGroup (Product (Ratio Int8))
-instance MultiplicativeAbelianGroup (Product (Ratio Int16))
-instance MultiplicativeAbelianGroup (Product (Ratio Int32))
-instance MultiplicativeAbelianGroup (Product (Ratio Int64))
-instance MultiplicativeAbelianGroup (Product (Ratio Word))
-instance MultiplicativeAbelianGroup (Product (Ratio Word8))
-instance MultiplicativeAbelianGroup (Product (Ratio Word16))
-instance MultiplicativeAbelianGroup (Product (Ratio Word32))
-instance MultiplicativeAbelianGroup (Product (Ratio Word64))
+instance Fractional a => MultiplicativeAbelianGroup (Product a)
 instance (MultiplicativeAbelianGroup a, MultiplicativeAbelianGroup b) => MultiplicativeAbelianGroup (a,b)
 instance (MultiplicativeAbelianGroup a, MultiplicativeAbelianGroup b, MultiplicativeAbelianGroup c) => MultiplicativeAbelianGroup (a,b,c)
 instance (MultiplicativeAbelianGroup a, MultiplicativeAbelianGroup b, MultiplicativeAbelianGroup c, MultiplicativeAbelianGroup d) => MultiplicativeAbelianGroup (a,b,c,d)
