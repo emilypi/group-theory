@@ -27,7 +27,7 @@ import qualified Data.Sequence as Seq
 
 -- | The free product of two 'Group's.
 --
--- __Note:__ This does nto perform simplification upon multiplication or construction.
+-- __Note:__ This does not perform simplification upon multiplication or construction.
 -- To do this, one should use 'simplify'.
 newtype FreeProduct g h = FreeProduct { runFreeProduct :: Seq (Either g h) }
     deriving (Show, Eq, Ord)
