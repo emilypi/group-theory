@@ -178,7 +178,7 @@ deriving newtype instance GroupOrder a => GroupOrder (Const a b)
 deriving newtype instance GroupOrder a => GroupOrder (Identity a)
 -}
 instance GroupOrder a => GroupOrder (Down a) where
-    order = order . getDown
+    order (Down a) = order a
 
 instance GroupOrder a => GroupOrder (Dual a) where
     order = order . getDual
