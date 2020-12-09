@@ -1,5 +1,7 @@
 {-# language Safe #-}
 {-# language FlexibleInstances #-}
+{-# language PatternSynonyms #-}
+{-# language ViewPatterns #-}
 -- |
 -- Module       : Data.Group.Order
 -- Copyright    : (c) 2020 Emily Pillmore
@@ -13,10 +15,15 @@
 --
 -- This module contains definitions for 'GroupOrder'.
 module Data.Group.Order(
-    GroupOrder(..),
-    Order(..),
-    orderForBits, lcmOrder,
-    FiniteGroup, safeOrder
+      GroupOrder(..)
+    -- ** Order
+    , Order(..)
+    , pattern Infinitary
+    , pattern Finitary
+    , orderForBits
+    , lcmOrder
+    , FiniteGroup
+    , finiteOrder
 ) where
 
 import Data.Monoid
@@ -31,8 +38,49 @@ import Data.Bits
     ( Bits(bit), FiniteBits(countTrailingZeros, finiteBitSize) )
 import Numeric.Natural (Natural)
 
-import Data.Group(Group(..), Order(..))
-import Data.Group.Finite (FiniteGroup, safeOrder)
+import Data.Group(Group(..))
+import Data.Group.Finite (FiniteGroup, finiteOrder)
+
+-- -------------------------------------------------------------------- --
+-- Group order
+
+-- | The order of a group element.
+--
+-- The order of a group element can either be infinite,
+-- as in the case of @Sum Integer@, or finite, as in the
+-- case of @Sum Word8@.
+--
+data Order = Infinite | Finite !Natural
+  deriving (Eq, Show)
+
+-- | Unidirectional pattern synonym for the infinite order of a
+-- group element.
+--
+pattern Infinitary :: (GroupOrder g) => g
+pattern Infinitary <- (order -> Infinite)
+
+-- | Unidirectional pattern synonym for the finite order of a
+-- group element.
+--
+pattern Finitary :: (GroupOrder g) => Natural -> g
+pattern Finitary n <- (order -> Finite n)
+
+-- | @lcmOrder x y@ calculates the least common multiple of two 'Order's.
+--   
+--   If both @x@ and @y@ are finite, it returns @'Finite' r@ where @r@
+--   is the least common multiple of them. Otherwise, it returns 'Infinite'.
+--
+-- === __Examples__:
+-- 
+-- >>> lcmOrder (Finite 2) (Finite 5)
+-- Finite 10
+-- >>> lcmOrder (Finite 2) (Finite 10)
+-- Finite 10
+-- >>> lcmOrder (Finite 1) Infinite
+-- Infinite
+lcmOrder :: Order -> Order -> Order
+lcmOrder (Finite m) (Finite n) = Finite (lcm m n)
+lcmOrder _          _          = Infinite
 
 -- | The typeclass of groups, equipped with the function
 --   computing the order of a specific element of a group.
@@ -60,8 +108,8 @@ class (Eq g, Group g) => GroupOrder g where
     -- @order x@ must be @Finite k@ if the order of @x@ is
     -- finite @k@, and must be @Infinite@ otherwise.
     --   
-    -- For a type which is also 'Data.Group.Finite.FiniteGroup',
-    -- 'safeOrder' is a valid implementation of 'order',
+    -- For a type which is also 'FiniteGroup',
+    -- @'Finite' . 'finiteOrder'@ is a valid implementation of 'order',
     -- if not efficient.
     order :: g -> Order
 
@@ -104,23 +152,6 @@ orderForBits (Sum a) = Finite (zeroFactor a)
 instance GroupOrder (Product Rational) where
     order 1 = Finite 1
     order _ = Infinite
-
--- | @lcmOrder x y@ calculates the least common multiple of two 'Order's.
---   
---   If both @x@ and @y@ are finite, it returns @'Finite' r@ where @r@
---   is the least common multiple of them. Otherwise, it returns 'Infinite'.
---
--- === __Examples__:
--- 
--- >>> lcmOrder (Finite 2) (Finite 5)
--- Finite 10
--- >>> lcmOrder (Finite 2) (Finite 10)
--- Finite 10
--- >>> lcmOrder (Finite 1) Infinite
--- Infinite
-lcmOrder :: Order -> Order -> Order
-lcmOrder (Finite m) (Finite n) = Finite (lcm m n)
-lcmOrder _          _          = Infinite
 
 instance (GroupOrder a, GroupOrder b) => GroupOrder (a,b) where
     order (a,b) = order a `lcmOrder` order b

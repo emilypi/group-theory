@@ -37,7 +37,7 @@ import Data.Bifunctor
 import Data.List (foldl')
 import Data.Map (Map)
 import qualified Data.Map.Strict as Map
-import Data.Group hiding (order)
+import Data.Group
 import Data.Group.Order
 
 -- $setup

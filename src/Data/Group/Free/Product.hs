@@ -21,7 +21,7 @@ module Data.Group.Free.Product
 ) where
 
 import Data.Bifunctor
-import Data.Group hiding (order)
+import Data.Group
 import Data.Group.Order
 
 import Data.Sequence (Seq(..))

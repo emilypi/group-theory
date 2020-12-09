@@ -37,11 +37,6 @@ module Data.Group
   -- ** Elements
 , pattern Inverse
 , pattern IdentityElem
-  -- ** Order
-, Order(..)
-, pattern Infinitary
-, pattern Finitary
-, order
   -- ** Abelianization
 , Abelianizer(..)
 , abelianize
@@ -57,9 +52,6 @@ module Data.Group
 import Data.Bool
 import "groups" Data.Group as G
 import Data.Monoid
-import Data.Ord
-
-import Numeric.Natural
 
 import Prelude hiding (negate, exponent)
 
@@ -193,51 +185,6 @@ pattern Inverse t <- (invert -> t) where
 pattern IdentityElem :: (Eq m, Monoid m) => m
 pattern IdentityElem <- ((== mempty) -> True) where
   IdentityElem = mempty
-
--- -------------------------------------------------------------------- --
--- Group order
-
--- | The order of a group element.
---
--- The order of a group element can either be infinite,
--- as in the case of @Sum Integer@, or finite, as in the
--- case of @Sum Word8@.
---
-data Order = Infinite | Finite !Natural
-  deriving (Eq, Show)
-
--- | Unidirectional pattern synonym for the infinite order of a
--- group element.
---
-pattern Infinitary :: (Eq g, Group g) => g
-pattern Infinitary <- (order -> Infinite)
-
--- | Unidirectional pattern synonym for the finite order of a
--- group element.
---
-pattern Finitary :: (Eq g, Group g) => Natural -> g
-pattern Finitary n <- (order -> Finite n)
-
--- | Calculate the exponent of a particular element in a group.
---
--- __Warning:__ If 'order' expects a 'Data.Group.FiniteGroup', this is gauranteed
--- to terminate. However, this is not true of groups in general. This will
--- spin forever if you give it something like non-zero @Sum Integer@.
---
--- === __Examples__:
---
--- >>> order @(Sum Word8) 3
--- Finite 255
---
-order :: (Eq g, Group g) => g -> Order
-order a = go 0 a where
-  go !n g
-    -- guard against ().
-    | g == mempty, n > 0 = Finite n
-    -- guard against infinite cyclic cases
-    | g == a, n > 0 = Infinite
-    | otherwise = go (succ n) (g <> a)
-{-# inline order #-}
 
 -- -------------------------------------------------------------------- --
 -- Abelianization
