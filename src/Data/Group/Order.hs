@@ -1,8 +1,5 @@
-{-# language CPP #-}
+{-# language Safe #-}
 {-# language FlexibleInstances #-}
-{-# language GeneralizedNewtypeDeriving #-}
-{-# language DerivingStrategies #-}
-{-# language StandaloneDeriving #-}
 -- |
 -- Module       : Data.Group.Order
 -- Copyright    : (c) 2020 Emily Pillmore
@@ -138,7 +135,25 @@ instance (GroupOrder a, GroupOrder b, GroupOrder c, GroupOrder d, GroupOrder e)
         => GroupOrder (a,b,c,d,e) where
     order (a,b,c,d,e) = order ((a,b,c),(d,e))
 
+{- Safe Haskell doesn't allow GND, at least for now.
+{-# language
+  GeneralizedNewtypeDeriving,
+  StandaloneDeriving,
+  DerivingStrategies
+#-}
 deriving newtype instance GroupOrder a => GroupOrder (Down a)
 deriving newtype instance GroupOrder a => GroupOrder (Dual a)
 deriving newtype instance GroupOrder a => GroupOrder (Const a b)
 deriving newtype instance GroupOrder a => GroupOrder (Identity a)
+-}
+instance GroupOrder a => GroupOrder (Down a) where
+    order = order . getDown
+
+instance GroupOrder a => GroupOrder (Dual a) where
+    order = order . getDual
+
+instance GroupOrder a => GroupOrder (Const a b) where
+    order = order . getConst
+
+instance GroupOrder a => GroupOrder (Identity a) where
+    order = order . runIdentity
