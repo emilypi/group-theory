@@ -56,6 +56,7 @@ library
     Data.Group.Free.Church
     Data.Group.Free.Product
     Data.Group.Multiplicative
+    Data.Group.Order
     Data.Group.Permutation
 
   build-depends:

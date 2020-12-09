@@ -1,5 +1,6 @@
 {-# language CPP #-}
 {-# language FlexibleInstances #-}
+{-# language BangPatterns #-}
 {-# language Safe #-}
 -- |
 -- Module       : Data.Group.Finite
@@ -19,7 +20,7 @@ module Data.Group.Finite
 ( -- * Finite groups
   FiniteGroup
   -- ** Finite group combinators
-, safeOrder
+, finiteOrder
 , safeClassify
   -- * Finite abelian groups
 , FiniteAbelianGroup
@@ -31,6 +32,7 @@ import Data.Group
 import Data.Monoid
 import Data.Proxy
 import Data.Group.Cyclic
+import Numeric.Natural (Natural)
 
 -- $setup
 --
@@ -68,18 +70,19 @@ instance (Bounded a, Num a) => FiniteGroup (Sum a)
 -- -------------------------------------------------------------------- --
 -- Finite group combinators
 
--- | A safe version of 'order' for 'FiniteGroup's.
---
--- This is gauranteed to terminate with a @Finite@ value.
+-- | Calculate the exponent of a particular element in a finite group.
 --
 -- === __Examples__:
 --
--- >>> order @(Sum Word8) 3
--- Finite 255
+-- >>> finiteOrder @(Sum Word8) 3
+-- 256
 --
-safeOrder :: (Eq g, FiniteGroup g) => g -> Order
-safeOrder = order
-{-# inline safeOrder #-}
+finiteOrder :: (Eq g, FiniteGroup g) => g -> Natural
+finiteOrder a = go 1 a where
+  go !n g
+    | g == mempty = n
+    | otherwise   = go (succ n) (g <> a)
+{-# inline finiteOrder #-}
 
 -- | Classify elements of a finite 'CyclicGroup'.
 --
