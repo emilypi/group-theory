@@ -21,7 +21,8 @@ module Data.Group.Free.Product
 ) where
 
 import Data.Bifunctor
-import Data.Group
+import Data.Group hiding (order)
+import Data.Group.Order
 
 import Data.Sequence (Seq(..))
 import qualified Data.Sequence as Seq
@@ -65,6 +66,20 @@ instance Monoid (FreeProduct g h) where
 
 instance (Group g, Group h) => Group (FreeProduct g h) where
   invert (FreeProduct ghs) = FreeProduct $ bimap invert invert <$> Seq.reverse ghs
+
+instance (GroupOrder g, GroupOrder h) => GroupOrder (FreeProduct g h) where
+  -- TODO: It performs simplify each time @order@ is called.
+  --   Once "auto-simplify" is implemented, this
+  --   call of simplify should be removed.
+  order = go . runFreeProduct . simplify
+    where
+      go Seq.Empty         = Finite 1
+      go (x :<| Seq.Empty) = either order order x
+      go (Left g :<| (ghs :|> Left g'))
+        | g <> g' == mempty = go ghs
+      go (Right h :<| (ghs :|> Right h'))
+        | h <> h' == mempty = go ghs
+      go _ = Infinite
 
 -- | Left injection of an alphabet @a@ into a free product.
 --

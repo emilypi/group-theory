@@ -37,7 +37,8 @@ import Data.Bifunctor
 import Data.List (foldl')
 import Data.Map (Map)
 import qualified Data.Map.Strict as Map
-import Data.Group
+import Data.Group hiding (order)
+import Data.Group.Order
 
 -- $setup
 --
@@ -71,6 +72,13 @@ instance Group (FreeGroup a) where
       . fmap (either Right Left)
       . reverse
       . runFreeGroup
+
+instance Eq a => GroupOrder (FreeGroup a) where
+    -- TODO: It performs simplify each time @order@ is called.
+    --   Once "auto-simplify" is implemented, this
+    --   call of simplify should be removed.
+    order g | simplify g == mempty = Finite 1
+            | otherwise           = Infinite
 
 instance Functor FreeGroup where
     fmap f (FreeGroup g) = FreeGroup $ fmap (bimap f f) g
@@ -143,6 +151,10 @@ instance (Ord a) => Monoid (FreeAbelianGroup a) where
 
 instance (Ord a) => Group (FreeAbelianGroup a) where
     invert (FreeAbelianGroup g) = FreeAbelianGroup $ fmap negate g
+
+instance (Ord a) => GroupOrder (FreeAbelianGroup a) where
+    order g | g == mempty = Finite 1
+            | otherwise   = Infinite
 
 -- NOTE: We can't implement Functor/Applicative/Monad here
 -- due to the Ord constraint. C'est La Vie!
