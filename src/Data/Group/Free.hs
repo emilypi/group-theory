@@ -147,8 +147,28 @@ present = flip ($)
 -- The intuition here is group elements correspond with their positive
 -- or negative multiplicities, and as such are simplified by construction.
 --
+-- === __Examples__:
+-- 
+-- >>> a = singleton 'a'
+-- >>> b = singleton 'b'
+-- >>> a
+-- FreeAbelianGroup $ fromList [('a',1)]
+-- >>> a <> b
+-- FreeAbelianGroup $ fromList [('a',1),('b',1)]
+-- >>> a <> b == b <> a
+-- True
+-- >>> invert a
+-- FreeAbelianGroup $ fromList [('a',-1)]
+-- >>> a <> b <> invert a
+-- FreeAbelianGroup $ fromList [('b',1)]
+-- >>> gtimes 5 (a <> b)
+-- FreeAbelianGroup $ fromList [('a',5),('b',5)]
 newtype FreeAbelianGroup a = MkFreeAbelianGroup (Map a Integer)
-    deriving (Show, Eq, Ord)
+    deriving (Eq, Ord)
+
+instance Show a => Show (FreeAbelianGroup a) where
+    showsPrec p (MkFreeAbelianGroup g) =
+        showParen (p > 0) $ ("FreeAbelianGroup $ " ++) . shows g
 
 -- | /O(n)/ Constructs a 'FreeAbelianGroup' from a finite 'Map' from
 --   the set of generators (@a@) to its multiplicities.
@@ -212,11 +232,22 @@ abfoldMap f = Map.foldlWithKey' step mempty . runFreeAbelianGroup
 
 -- | Functorial 'fmap' for a 'FreeAbelianGroup'.
 --
+-- === __Examples__:
+-- 
+-- >>> singleton 'a' <> singleton 'A'
+-- FreeAbelianGroup $ fromList [('A',1),('a',1)]
+-- >>> import Data.Char (toUpper)
+-- >>> abmap toUpper $ singleton 'a' <> singleton 'A'
+-- FreeAbelianGroup $ fromList [('A',2)]
 abmap :: (Ord b) => (a -> b) -> FreeAbelianGroup a -> FreeAbelianGroup b
 abmap f = abfoldMap (singleton . f)
 
 -- | Lift a singular value into a 'FreeAbelianGroup'. Analogous to 'pure'.
 --
+-- === __Examples__:
+-- 
+-- >>> singleton "foo"
+-- FreeAbelianGroup $ fromList [("foo",1)]
 singleton :: a -> FreeAbelianGroup a
 singleton a = MkFreeAbelianGroup $ Map.singleton a 1
 
