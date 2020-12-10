@@ -1,3 +1,6 @@
+{-# language TypeApplications #-}
+{-# language ScopedTypeVariables #-}
+{-# language BangPatterns #-}
 {-# language PatternSynonyms #-}
 {-# language Safe #-}
 {-# language ViewPatterns #-}
@@ -31,20 +34,42 @@ module Data.Group.Permutation
 
 
 import Data.Group
-import Data.Group.Additive
-import Data.Group.Multiplicative
+import Data.Group.Order
+
+import qualified Data.IntSet as ISet
+import Data.Function (on)
+import Numeric.Natural (Natural)
 
 infixr 0 $-, -$
 
 -- -------------------------------------------------------------------- --
 -- Permutations
 
--- | Isomorphism of a finite set onto itself. Each entry consists of one
+-- | Isomorphism of a type onto itself. Each entry consists of one
 -- half of the isomorphism.
 --
 -- /Note/: It is the responsibility of the user to provide inverse proofs
 -- for 'to' and 'from'. Be responsible!
 --
+-- === __Examples:__
+-- 
+-- >>> p1 = permute succ pred :: Permutation Integer
+-- >>> p2 = permute negate negate :: Permutation Integer
+-- >>> to (p1 <> p2) 2
+-- -1
+-- >>> from (p1 <> p2) (-1)
+-- 2
+-- >>> to (p2 <> p1) 2
+-- -3
+-- 
+-- Permutations on a finite set @a@ (, indicated by satisfying
+-- @(Bounded a, Enum a)@ constraint,) can be tested their equality
+-- and computed its 'order'.
+-- >>> c1 = permute not not :: Permutation Bool
+-- >>> c1 <> c1 == mempty
+-- True
+-- >>> order c1
+-- Finite 2
 data Permutation a = Permutation
   { to :: a -> a
     -- ^ The forward half of the bijection
@@ -55,20 +80,47 @@ data Permutation a = Permutation
 -- instance Profunctor Permutation where
 --   dimap = :'(
 
-instance Semigroup a => Semigroup (Permutation a) where
-  a <> b = Permutation (to a <> to b) (from a <> from b)
+instance Semigroup (Permutation a) where
+  a <> b = Permutation (to a . to b) (from b . from a)
 
-instance Monoid a => Monoid (Permutation a) where
+instance Monoid (Permutation a) where
   mempty = Permutation id id
 
-instance Group a => Group (Permutation a) where
-  invert (Permutation t f) = Permutation (f . t) (t . f)
+instance Group (Permutation a) where
+  invert (Permutation t f) = Permutation f t
 
-instance Abelian a => Abelian (Permutation a)
-instance AdditiveGroup a => AdditiveGroup (Permutation a)
-instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Permutation a)
-instance MultiplicativeGroup a => MultiplicativeGroup (Permutation a)
+instance (Enum a, Bounded a) => Eq (Permutation a) where
+  (==) = (==) `on` (functionRepr . to)
 
+instance (Enum a, Bounded a) => Ord (Permutation a) where
+  compare = compare `on` (functionRepr . to)
+
+instance (Enum a, Bounded a) => GroupOrder (Permutation a) where
+  order Permutation{to = f} = Finite (go 1 fullSet)
+    where
+      n = 1 + fromEnum (maxBound @a)
+      fullSet = ISet.fromDistinctAscList [0 .. n - 1]
+      
+      f' :: Int -> Int
+      f' = fromEnum . f . toEnum
+      
+      go :: Natural -> ISet.IntSet -> Natural
+      go !ord elements = case ISet.minView elements of
+        Nothing             -> ord
+        Just (k, elements') ->
+          let (period, elements'') = takeCycle k elements'
+          in go (lcm period ord) elements''
+      
+      takeCycle :: Int -> ISet.IntSet -> (Natural, ISet.IntSet)
+      takeCycle k = loop 1 (f' k)
+        where
+          loop !period j elements
+            | j `ISet.member` elements      = loop (succ period) (f' j) (ISet.delete j elements)
+            | {- j ∉ elements && -} j == k = (period, elements)
+            | otherwise                     = error $ "Non-bijective: witness=toEnum " ++ show j
+
+functionRepr :: (Enum a, Bounded a) => (a -> a) -> [Int]
+functionRepr f = fromEnum . f <$> [minBound .. maxBound]
 
 -- -------------------------------------------------------------------- --
 -- Permutation group combinators
