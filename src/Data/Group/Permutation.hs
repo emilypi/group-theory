@@ -64,7 +64,8 @@ infixr 0 $-, -$
 -- 
 -- Permutations on a finite set @a@ (, indicated by satisfying
 -- @(Bounded a, Enum a)@ constraint,) can be tested their equality
--- and computed its 'order'.
+-- and computed their 'order's.
+-- 
 -- >>> c1 = permute not not :: Permutation Bool
 -- >>> c1 <> c1 == mempty
 -- True
