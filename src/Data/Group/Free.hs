@@ -1,3 +1,4 @@
+{-# LANGUAGE PatternSynonyms #-}
 {-# language Safe #-}
 -- |
 -- Module       : Data.Group.Free
@@ -22,8 +23,12 @@ module Data.Group.Free
 , interpret'
 , present
   -- * Free abelian groups
-, FreeAbelianGroup(..)
+, FreeAbelianGroup()
+, pattern FreeAbelianGroup
+, makeFreeAbelianGroup
+, runFreeAbelianGroup
   -- ** Free abelian group combinators
+, abfoldMap
 , abmap
 , abjoin
 , singleton
@@ -37,6 +42,9 @@ import Data.Bifunctor
 import Data.List (foldl')
 import Data.Map (Map)
 import qualified Data.Map.Strict as Map
+import qualified Data.Map.Merge.Strict as Map
+
+import Data.Semigroup(Semigroup(..))
 import Data.Group
 import Data.Group.Order
 
@@ -139,18 +147,51 @@ present = flip ($)
 -- The intuition here is group elements correspond with their positive
 -- or negative multiplicities, and as such are simplified by construction.
 --
-newtype FreeAbelianGroup a = FreeAbelianGroup { runFreeAbelian :: Map a Int }
+newtype FreeAbelianGroup a = MkFreeAbelianGroup (Map a Integer)
     deriving (Show, Eq, Ord)
 
+-- | /O(n)/ Constructs a 'FreeAbelianGroup' from a finite 'Map' from
+--   the set of generators (@a@) to its multiplicities.
+makeFreeAbelianGroup :: Ord a => Map a Integer -> FreeAbelianGroup a
+makeFreeAbelianGroup = MkFreeAbelianGroup . Map.filter (/= 0)
+
+-- | /O(1)/ Gets a representation of 'FreeAbelianGroup' as
+--   'Map'. The returned map contains no records with
+--   multiplicity @0@ i.e. @'Map.lookup' a@ on the returned map
+--   never returns @Just 0@.
+runFreeAbelianGroup :: FreeAbelianGroup a -> Map a Integer
+runFreeAbelianGroup (MkFreeAbelianGroup g) = g
+
+pattern FreeAbelianGroup :: Ord a => Map a Integer -> FreeAbelianGroup a
+pattern FreeAbelianGroup g <- MkFreeAbelianGroup g where
+    FreeAbelianGroup g = makeFreeAbelianGroup g
+
+{-# COMPLETE FreeAbelianGroup #-}
+
 instance (Ord a) => Semigroup (FreeAbelianGroup a) where
-    (FreeAbelianGroup g) <> (FreeAbelianGroup g') =
-      FreeAbelianGroup $ Map.unionWith (+) g g'
+    (MkFreeAbelianGroup g) <> (MkFreeAbelianGroup g') =
+      MkFreeAbelianGroup $ mergeG g g'
+      where
+        mergeG = Map.merge
+          Map.preserveMissing
+          Map.preserveMissing
+          (Map.zipWithMaybeMatched $ \_ m n -> nonZero $ m + n)
+        nonZero n = if n == 0 then Nothing else Just n
+    
+    stimes = gtimes
 
 instance (Ord a) => Monoid (FreeAbelianGroup a) where
-    mempty = FreeAbelianGroup mempty
+    mempty = MkFreeAbelianGroup Map.empty
 
 instance (Ord a) => Group (FreeAbelianGroup a) where
-    invert (FreeAbelianGroup g) = FreeAbelianGroup $ fmap negate g
+    invert (MkFreeAbelianGroup g) = MkFreeAbelianGroup $ Map.map negate g
+    
+    pow _ 0 = mempty
+    pow (MkFreeAbelianGroup g) n
+      | n == 0    = mempty
+      | otherwise = MkFreeAbelianGroup $ Map.map (toInteger n *) g
+
+instance (Ord a) => Abelian (FreeAbelianGroup a)
 
 instance (Ord a) => GroupOrder (FreeAbelianGroup a) where
     order g | g == mempty = Finite 1
@@ -159,24 +200,32 @@ instance (Ord a) => GroupOrder (FreeAbelianGroup a) where
 -- NOTE: We can't implement Functor/Applicative/Monad here
 -- due to the Ord constraint. C'est La Vie!
 
+-- | Given a function from generators to an abelian group @g@,
+--   lift that function to a group homomorphism from 'FreeAbelianGroup' to @g@.
+--   
+--   In other words, it's a function analogus to 'foldMap' for 'Monoid' or
+--   'Data.Group.Foldable.goldMap' for @Group@.
+abfoldMap :: (Abelian g) => (a -> g) -> FreeAbelianGroup a -> g
+abfoldMap f = Map.foldlWithKey' step mempty . runFreeAbelianGroup
+  where
+    step g a n = g <> pow (f a) n
+
 -- | Functorial 'fmap' for a 'FreeAbelianGroup'.
 --
 abmap :: (Ord b) => (a -> b) -> FreeAbelianGroup a -> FreeAbelianGroup b
-abmap f (FreeAbelianGroup g) = FreeAbelianGroup $ Map.mapKeys f g
+abmap f = abfoldMap (singleton . f)
 
 -- | Lift a singular value into a 'FreeAbelianGroup'. Analogous to 'pure'.
 --
 singleton :: a -> FreeAbelianGroup a
-singleton a = FreeAbelianGroup $ Map.singleton a 1
+singleton a = MkFreeAbelianGroup $ Map.singleton a 1
 
 -- | Monadic 'join' for a 'FreeAbelianGroup'.
 --
 abjoin :: (Ord a) => FreeAbelianGroup (FreeAbelianGroup a) -> FreeAbelianGroup a
-abjoin (FreeAbelianGroup g) = FreeAbelianGroup $ Map.foldMapWithKey go g
-    where
-      go (FreeAbelianGroup g') n = fmap (*n) g'
+abjoin = abInterpret
 
 -- | Interpret a free group as a word in the underlying group @g@.
 --
-abInterpret :: (Group g) => FreeAbelianGroup g -> g
-abInterpret (FreeAbelianGroup g) = Map.foldMapWithKey (flip gtimes) g
+abInterpret :: (Abelian g) => FreeAbelianGroup g -> g
+abInterpret = abfoldMap id
