@@ -22,6 +22,9 @@ module Data.Group.Permutation
 ( -- * Permutation groups
   Permutation(..)
   -- ** Permutation group combinators
+, equalPermutation
+, comparePermutation
+, orderOfPermutation
 , permute
 , pairwise
 , (-$)
@@ -34,7 +37,6 @@ module Data.Group.Permutation
 
 
 import Data.Group
-import Data.Group.Order
 
 import qualified Data.IntSet as ISet
 import Data.Function (on)
@@ -52,7 +54,7 @@ infixr 0 $-, -$
 -- for 'to' and 'from'. Be responsible!
 --
 -- === __Examples:__
---
+-- 
 -- >>> p1 = permute succ pred :: Permutation Integer
 -- >>> p2 = permute negate negate :: Permutation Integer
 -- >>> to (p1 <> p2) 2
@@ -67,10 +69,10 @@ infixr 0 $-, -$
 -- and computed their 'order's.
 --
 -- >>> c1 = permute not not :: Permutation Bool
--- >>> c1 <> c1 == mempty
+-- >>> equalPermutation (c1 <> c1) mempty
 -- True
--- >>> order c1
--- Finite 2
+-- >>> orderOfPermutation c1
+-- 2
 data Permutation a = Permutation
   { to :: a -> a
     -- ^ The forward half of the bijection
@@ -90,40 +92,80 @@ instance Monoid (Permutation a) where
 instance Group (Permutation a) where
   invert (Permutation t f) = Permutation f t
 
-instance (Enum a, Bounded a) => Eq (Permutation a) where
-  (==) = (==) `on` (functionRepr . to)
+-- | Equality test for permutations on a finite type 'a'
+-- 
+-- This module /intentionally omits/ the following instance, albeit
+-- 'equalPermutation' is suitable implementation of
+-- @(==)@ operator for many types.
+-- 
+-- > instance (Enum a, Bounded a) => Eq (Permutation a) where
+-- >   (==) = equalPermutation
+-- 
+-- This is because some type satisfying @(Enum a, Bounded a)@ are
+-- actually finite but too large to use @equalPermutation@ on.
+-- For example, you can call @equalPermutation@ on @Permutation Int@,
+-- but it takes too much computation to be considered usable.
+equalPermutation
+  :: (Enum a, Bounded a) => Permutation a -> Permutation a -> Bool
+equalPermutation = (==) `on` (functionRepr . to)
 
-instance (Enum a, Bounded a) => Ord (Permutation a) where
-  compare = compare `on` (functionRepr . to)
+-- | Comparison for permutations on a finite type 'a'
+-- 
+-- This module /intentionally omits/ the following instance, albeit
+-- 'comparePermutation' is suitable implementation of
+-- @compare@ method for many types.
+-- 
+-- > instance (Enum a, Bounded a) => Eq (Permutation a) where
+-- >   compare = comparePermutation
+-- 
+-- This is because some type satisfying @(Enum a, Bounded a)@ are
+-- actually finite but too large to use @comparePermutation@ on.
+-- For example, you can call @comparePermutation@ on @Permutation Int@,
+-- but it takes too much computation to be considered usable.
+comparePermutation
+  :: (Enum a, Bounded a) => Permutation a -> Permutation a -> Ordering
+comparePermutation = compare `on` (functionRepr . to)
 
-instance (Enum a, Bounded a) => GroupOrder (Permutation a) where
-  order Permutation{to = f} = Finite (go 1 fullSet)
+functionRepr :: (Enum a, Bounded a) => (a -> a) -> [Int]
+functionRepr f = fromEnum . f <$> [minBound .. maxBound]
+
+-- | Order counting for a permutation on a finite type 'a'
+-- 
+-- This module /intentionally omits/ the following instance, albeit
+-- 'orderOfPermutation' is suitable implementation of
+-- @order@ method for many types.
+-- 
+-- > instance (Enum a, Bounded a) => GroupOrder (Permutation a) where
+-- >   order a = Finite (orderOfPermutation a)
+-- 
+-- This is because some type satisfying @(Enum a, Bounded a)@ are
+-- actually finite but too large to use @orderOfPermutation@ on.
+-- For example, you can call @orderOfPermutation@ on @Permutation Int@,
+-- but it takes too much computation to be considered usable.
+orderOfPermutation
+  :: forall a. (Enum a, Bounded a) => Permutation a -> Natural
+orderOfPermutation Permutation{to = f} = go 1 fullSet
     where
       n = 1 + fromEnum (maxBound @a)
       fullSet = ISet.fromDistinctAscList [0 .. n - 1]
-
+      
       f' :: Int -> Int
       f' = fromEnum . f . toEnum
-
+      
       go :: Natural -> ISet.IntSet -> Natural
       go !ord elements = case ISet.minView elements of
-        Nothing -> ord
+        Nothing             -> ord
         Just (k, elements') ->
           let (period, elements'') = takeCycle k elements'
           in go (lcm period ord) elements''
-
+      
       takeCycle :: Int -> ISet.IntSet -> (Natural, ISet.IntSet)
       takeCycle k = loop 1 (f' k)
         where
           loop !period j elements
-            | j `ISet.member` elements = loop (succ period) (f' j) (ISet.delete j elements)
+            | j `ISet.member` elements      = loop (succ period) (f' j) (ISet.delete j elements)
             | {- j ∉ elements && -} j == k = (period, elements)
-            | otherwise = error $ "Non-bijective: witness=toEnum " ++ show j
-
--- | Apply a function to all enumerated elements of a bounded enumerable type
---
-functionRepr :: (Enum a, Bounded a) => (a -> a) -> [Int]
-functionRepr f = fromEnum . f <$> [minBound .. maxBound]
+            | otherwise                     = error $ "Non-bijective: witness=toEnum " ++ show j
 
 -- -------------------------------------------------------------------- --
 -- Permutation group combinators
