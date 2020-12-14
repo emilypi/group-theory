@@ -46,7 +46,8 @@ import Data.Proxy
 
 -- | A group on 'Applicative' functors.
 --
--- 'Cancellative' functors have the following laws:
+-- 'Cancellative' functors have the following laws in addition to those of
+-- 'Alternative':
 --
 -- [Left Cancellation] @ 'cancel' a '<|>' a = 'empty' @
 -- [Rigth Cancellation] @ a '<|>' 'cancel' a = 'empty' @

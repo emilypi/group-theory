@@ -1,8 +1,8 @@
-{-# language TypeApplications #-}
-{-# language ScopedTypeVariables #-}
 {-# language BangPatterns #-}
 {-# language PatternSynonyms #-}
 {-# language Safe #-}
+{-# language ScopedTypeVariables #-}
+{-# language TypeApplications #-}
 {-# language ViewPatterns #-}
 -- |
 -- Module       : Data.Group
@@ -52,7 +52,7 @@ infixr 0 $-, -$
 -- for 'to' and 'from'. Be responsible!
 --
 -- === __Examples:__
--- 
+--
 -- >>> p1 = permute succ pred :: Permutation Integer
 -- >>> p2 = permute negate negate :: Permutation Integer
 -- >>> to (p1 <> p2) 2
@@ -61,11 +61,11 @@ infixr 0 $-, -$
 -- 2
 -- >>> to (p2 <> p1) 2
 -- -3
--- 
+--
 -- Permutations on a finite set @a@ (, indicated by satisfying
 -- @(Bounded a, Enum a)@ constraint,) can be tested their equality
 -- and computed their 'order's.
--- 
+--
 -- >>> c1 = permute not not :: Permutation Bool
 -- >>> c1 <> c1 == mempty
 -- True
@@ -90,39 +90,38 @@ instance Monoid (Permutation a) where
 instance Group (Permutation a) where
   invert (Permutation t f) = Permutation f t
 
-equalPermutation
-  :: (Enum a, Bounded a) => Permutation a -> Permutation a -> Bool
-equalPermutation = (==) `on` (functionRepr . to)
+instance (Enum a, Bounded a) => Eq (Permutation a) where
+  (==) = (==) `on` (functionRepr . to)
 
-comparePermutation
-  :: (Enum a, Bounded a) => Permutation a -> Permutation a -> Ordering
-comparePermutation = compare `on` (functionRepr . to)
+instance (Enum a, Bounded a) => Ord (Permutation a) where
+  compare = compare `on` (functionRepr . to)
 
-orderOfPermutation
-  :: (Enum a, Bounded a) => Permutation -> Natural
-orderOfPermutation Permutation{to = f} = go 1 fullSet
+instance (Enum a, Bounded a) => GroupOrder (Permutation a) where
+  order Permutation{to = f} = Finite (go 1 fullSet)
     where
       n = 1 + fromEnum (maxBound @a)
       fullSet = ISet.fromDistinctAscList [0 .. n - 1]
-      
+
       f' :: Int -> Int
       f' = fromEnum . f . toEnum
-      
+
       go :: Natural -> ISet.IntSet -> Natural
       go !ord elements = case ISet.minView elements of
-        Nothing             -> ord
+        Nothing -> ord
         Just (k, elements') ->
           let (period, elements'') = takeCycle k elements'
           in go (lcm period ord) elements''
-      
+
       takeCycle :: Int -> ISet.IntSet -> (Natural, ISet.IntSet)
       takeCycle k = loop 1 (f' k)
         where
           loop !period j elements
-            | j `ISet.member` elements      = loop (succ period) (f' j) (ISet.delete j elements)
+            | j `ISet.member` elements = loop (succ period) (f' j) (ISet.delete j elements)
             | {- j ∉ elements && -} j == k = (period, elements)
-            | otherwise                     = error $ "Non-bijective: witness=toEnum " ++ show j
+            | otherwise = error $ "Non-bijective: witness=toEnum " ++ show j
 
+-- | Apply a function to all enumerated elements of a bounded enumerable type
+--
 functionRepr :: (Enum a, Bounded a) => (a -> a) -> [Int]
 functionRepr f = fromEnum . f <$> [minBound .. maxBound]
 

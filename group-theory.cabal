@@ -3,28 +3,26 @@ name:            group-theory
 version:         0.2.0.0
 synopsis:        The theory of groups
 description:
-  This package includes definitions for Groups (monoids with invertibility), including
-  finite, fre, simple, cyclic, and permutation groups. Additionally, we add the concept
+  This package includes definitions for Groups (Monoids with invertibility), including order calculations
+  as well as finite, free, cyclic, and permutation groups. Additionally, we add the concept
   of 'Cancellative' functors, building upon 'Alternative' applicative functors.
   .
-  There is plenty of other group theory related packages on Hackage:
+  There are other group theory related packages on Hackage:
   .
-  * [groups](https://hackage.haskell.org/package/groups): minimal definition and lots of good instances.
+  * [groups](https://hackage.haskell.org/package/groups): A minimal, low-footprint definition
   .
-  * [magmas](https://hackage.haskell.org/package/magmas): good pedagogy
+  * [magmas](https://hackage.haskell.org/package/magmas): A pedagogical hierarchy of algebras, starting from Magmas, including Loops, and Inverse Semigroups.
   .
-  * [monoids](https://hackage.haskell.org/package/monoids): deprecated in favor of [reducers](https://hackage.haskell.org/package/reducers), which don't have @Data.Group@
+  * [arithmoi](https://hackage.haskell.org/package/arithmoi): Number theory, typelevel modular arithmetic, and cyclic groups.
   .
-  * [arithmoi](https://hackage.haskell.org/package/arithmoi): Have cyclic groups, but also much more numerics
-  .
-  @group-theory@ tries to combine the best parts.
+  This package, @group-theory@, tries to combine the best parts, while focusing on usability and intuitiveness.
 
 homepage:        https://github.com/emilypi/group-theory
 bug-reports:     https://github.com/emilypi/group-theory/issues
 license:         BSD3
 license-file:    LICENSE
 author:          Emily Pillmore
-maintainer:      emilypi@cohomolo.gy
+maintainer:      Emily Pillmore <emilypi@cohomolo.gy>, Reed Mullanix <reedmullanix@gmail.com>
 copyright:       (c) 2020 Emily Pillmore <emilypi@cohomolo.gy>
 category:        Algebra, Math, Permutations, Groups
 build-type:      Custom
