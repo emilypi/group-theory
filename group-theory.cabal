@@ -9,13 +9,11 @@ description:
   .
   There are other group theory related packages on Hackage:
   .
-  * [groups](https://hackage.haskell.org/package/groups): A minimal, low-footprint definition. @group-theory@ depends on @groups@ and builds on its work.
+  * [groups](https://hackage.haskell.org/package/groups): A minimal, low-footprint definition
   .
-  * [magmas](https://hackage.haskell.org/package/magmas): A more pedagogically "complete" hierarchy of algebras, starting from Magmas, including Loops, and Inverse Semigroups.
+  * [magmas](https://hackage.haskell.org/package/magmas): A pedagogical hierarchy of algebras, starting from Magmas, including Loops, and Inverse Semigroups.
   .
-  * [monoids](https://hackage.haskell.org/package/monoids): This package historically featured Groups, but was deprecated in favor of [reducers](https://hackage.haskell.org/package/reducers), which does not include them.
-  .
-  * [arithmoi](https://hackage.haskell.org/package/arithmoi): Focuses on number theory, typelevel modular arithmetic, and cyclic groups.
+  * [arithmoi](https://hackage.haskell.org/package/arithmoi): Number theory, typelevel modular arithmetic, and cyclic groups.
   .
   This package, @group-theory@, tries to combine the best parts, while focusing on usability and intuitiveness.
 

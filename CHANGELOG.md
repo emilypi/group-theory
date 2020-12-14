@@ -1,5 +1,15 @@
 # Revision history for group-theory
 
+## 0.2.0.0
+
+* Depend on the `groups` package ([#19](https://github.com/emilypi/group-theory/pull/19) - thanks to @taneb for providing the package!)
+* Added `FreeProduct` ([#13](https://github.com/emilypi/group-theory/pull/13))
+* Removed unsound `Group` instances ([#14](https://github.com/emilypi/group-theory/pull/14))
+* Add the `GroupOrder` typeclass for order calculations ([#20](https://github.com/emilypi/group-theory/pull/20))
+* Fixed 'Permutation' instances ([#21](https://github.com/emilypi/group-theory/pull/21))
+* Bugfixes for `FreeAbelianGroup`, allowing it to handle sparsity more robustly, as well as handling
+  `mempty` values on construction with a pattern synonym.
+
 ## 0.1.0.0
 
 * First version. Released on an unsuspecting world.

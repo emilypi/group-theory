@@ -12,7 +12,7 @@
 -- Portability  : non-portable
 --
 -- This module provides definitions for Church-encoded
--- 'FreeGroup's, 'FreeAbelianGroup's, along with useful combinators.
+-- 'FreeGroup's, 'Data.Group.Free.Internal.FreeAbelianGroup's, along with useful combinators.
 --
 module Data.Group.Free.Church
 ( -- * Church-encoded free groups
@@ -106,7 +106,7 @@ presentFG = flip ($)
 ----------------------------------------
 -- Free Abelian Groups
 
--- | The Church-encoding of a 'FreeAbelianGroup'.
+-- | The Church-encoding of a 'Data.Group.Free.Internal.FreeAbelianGroup'.
 --
 -- This datatype represents the free group on some @a@-valued
 -- generators, along with their exponents in the group.
@@ -157,19 +157,19 @@ instance Alternative FA where
   empty = mempty
   (<|>) = (<>)
 
--- | Interpret a Church-encoded free abelian group as a concrete 'FreeAbelianGroup'.
+-- | Interpret a Church-encoded free abelian group as a concrete 'Data.Group.Free.Internal.FreeAbelianGroup'.
 --
 interpretFA :: Abelian g => FA g -> g
 interpretFA (FA fa) = fa pow
 {-# inline interpretFA #-}
 
--- | Convert a Church-encoded free abelian group to a concrete 'FreeAbelianGroup'.
+-- | Convert a Church-encoded free abelian group to a concrete 'Data.Group.Free.Internal.FreeAbelianGroup'.
 --
 reifyFA :: Ord a => FA a -> FreeAbelianGroup a
 reifyFA = interpretFA . fmap singleton
 {-# inline reifyFA #-}
 
--- | Convert a concrete 'FreeAbelianGroup' to a Church-encoded free abelian group.
+-- | Convert a concrete 'Data.Group.Free.Internal.FreeAbelianGroup' to a Church-encoded free abelian group.
 --
 reflectFA :: FreeAbelianGroup a -> FA a
 reflectFA fa =
