@@ -34,6 +34,7 @@ module Data.Group.Free.Church
 import Control.Applicative
 import Control.Monad
 
+import Data.Semigroup(Semigroup(..))
 import Data.Group
 import Data.Group.Free
 import qualified Data.Map.Strict as Map
@@ -106,16 +107,36 @@ presentFG = flip ($)
 -- This datatype represents the free group on some @a@-valued
 -- generators, along with their exponents in the group.
 --
-newtype FA a = FA { runFA :: forall g. (Group g) => (a -> Int -> g) -> g }
+newtype FA a = FA { runFA :: forall g. (Abelian g) => (a -> Integer -> g) -> g }
 
 instance Semigroup (FA a) where
   (FA g) <> (FA g') = FA $ \k -> g k <> g' k
+  stimes = gtimes
 
 instance Monoid (FA a) where
   mempty = FA $ const mempty
 
 instance Group (FA a) where
-  invert (FA g) = FA (invert . g)
+  invert g = pow g (-1 :: Integer)
+
+  {-
+  Note: This implementation "optimizes" from the default implementation of
+  'pow', or more natural
+  
+  > pow (FA g) n = FA $ \k -> gtimes n (g k)
+  
+  by delaying the call of 'gtimes' as late as possible.
+
+  This is only possible because we expect 'Group g' to be an abelian group,
+  which implies the following equation hold:
+  
+  > pow (x <> y) n = pow x n <> pow y n
+  -}
+  pow (FA g) n
+    | n == 0    = mempty
+    | otherwise = FA $ \k -> g (\a i -> k a (toInteger n * i))
+
+instance Abelian (FA a)
 
 instance Functor FA where
   fmap f (FA fa) = FA $ \k -> fa (k . f)
@@ -126,7 +147,7 @@ instance Applicative FA where
 
 instance Monad FA where
   return = pure
-  (FA fa) >>= f = FA $ \k -> fa (\a n -> gtimes n $ (runFA $ f a) k)
+  fa >>= f = interpretFA $ fmap f fa
 
 instance Alternative FA where
   empty = mempty
@@ -134,8 +155,8 @@ instance Alternative FA where
 
 -- | Interpret a Church-encoded free abelian group as a concrete 'FreeAbelianGroup'.
 --
-interpretFA :: Group g => FA g -> g
-interpretFA (FA fa) = fa (flip gtimes)
+interpretFA :: Abelian g => FA g -> g
+interpretFA (FA fa) = fa pow
 {-# inline interpretFA #-}
 
 -- | Convert a Church-encoded free abelian group to a concrete 'FreeAbelianGroup'.
@@ -146,13 +167,15 @@ reifyFA = interpretFA . fmap singleton
 
 -- | Convert a concrete 'FreeAbelianGroup' to a Church-encoded free abelian group.
 --
-reflectFA :: Ord a => FreeAbelianGroup a -> FA a
-reflectFA (FreeAbelianGroup fa) = FA $ \k -> Map.foldMapWithKey k fa
+reflectFA :: FreeAbelianGroup a -> FA a
+reflectFA fa =
+  let g = runFreeAbelianGroup fa
+  in FA $ \k -> Map.foldMapWithKey k g
 {-# inline reflectFA #-}
 
 -- | Forget the commutative structure of a Church-encoded free abelian group,
 -- turning it into a standard free group.
---
-forgetFA :: Group a => FA a -> FG a
-forgetFA fa = FG ($ interpretFA fa)
+forgetFA :: (Ord a) => FA a -> FG a
+forgetFA fa = case reifyFA fa of
+  FreeAbelianGroup fa' -> FG $ \t -> Map.foldMapWithKey (\a n -> t a `pow` n) fa'
 {-# inline forgetFA #-}
