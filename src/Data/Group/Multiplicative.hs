@@ -1,5 +1,4 @@
 {-# language FlexibleInstances #-}
-{-# language PackageImports #-}
 {-# language Safe #-}
 -- |
 -- Module       : Data.Group.Multiplicative

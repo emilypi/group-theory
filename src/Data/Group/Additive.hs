@@ -1,6 +1,5 @@
 {-# language CPP #-}
 {-# language FlexibleInstances #-}
-{-# language PackageImports #-}
 {-# language Safe #-}
 -- |
 -- Module       : Data.Group.Additive
@@ -35,12 +34,8 @@ import Data.Functor.Contravariant
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Group
-import "groups" Data.Group as G
-import Data.Int
 import Data.Proxy
-import Data.Ratio
 import Data.Semigroup
-import Data.Word
 
 import Prelude hiding ((-), (+))
 
@@ -137,7 +132,7 @@ copower = gtimes
 -- | An additive abelian group is an 'Abelian' whose operation can be thought of
 -- as commutative addition in some sense. Almost all additive groups are abelian.
 --
-class (G.Abelian g, AdditiveGroup g) => AdditiveAbelianGroup g
+class (Abelian g, AdditiveGroup g) => AdditiveAbelianGroup g
 instance AdditiveAbelianGroup ()
 instance AdditiveAbelianGroup b => AdditiveAbelianGroup (a -> b)
 instance AdditiveAbelianGroup a => AdditiveAbelianGroup (Dual a)
