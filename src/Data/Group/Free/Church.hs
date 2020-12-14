@@ -41,12 +41,16 @@ import qualified Data.Map.Strict as Map
 
 -- | The Church-encoding of a 'FreeGroup'.
 --
--- This datatype represents the free group on some @a@-valued
+-- This datatype represents the "true" free group in Haskell on some @a@-valued
 -- generators. For more information on why this encoding is preferred,
 -- see Dan Doel's <http://comonad.com/reader/2015/free-monoids-in-haskell/ article> in
 -- the Comonad Reader.
 --
-newtype FG a = FG { runFG :: forall g. (Group g) => (a -> g) -> g }
+-- While 'FreeGroup' et al are free in a strict language, and are more intuitive,
+-- they are not associative wtih respect to bottoms. 'FG' and 'FA' however, are,
+-- and should be preferred when working with possibly undefined data.
+--
+newtype FG a = FG { runFG :: forall g. Group g => (a -> g) -> g }
 
 instance Semigroup (FG a) where
   (FG g) <> (FG g') = FG $ \k -> g k <> g' k
@@ -107,7 +111,7 @@ presentFG = flip ($)
 -- This datatype represents the free group on some @a@-valued
 -- generators, along with their exponents in the group.
 --
-newtype FA a = FA { runFA :: forall g. (Abelian g) => (a -> Integer -> g) -> g }
+newtype FA a = FA { runFA :: forall g. Abelian g => (a -> Integer -> g) -> g }
 
 instance Semigroup (FA a) where
   (FA g) <> (FA g') = FA $ \k -> g k <> g' k
@@ -122,14 +126,14 @@ instance Group (FA a) where
   {-
   Note: This implementation "optimizes" from the default implementation of
   'pow', or more natural
-  
+
   > pow (FA g) n = FA $ \k -> gtimes n (g k)
-  
+
   by delaying the call of 'gtimes' as late as possible.
 
   This is only possible because we expect 'Group g' to be an abelian group,
   which implies the following equation hold:
-  
+
   > pow (x <> y) n = pow x n <> pow y n
   -}
   pow (FA g) n
@@ -177,5 +181,5 @@ reflectFA fa =
 -- turning it into a standard free group.
 forgetFA :: (Ord a) => FA a -> FG a
 forgetFA fa = case reifyFA fa of
-  FreeAbelianGroup fa' -> FG $ \t -> Map.foldMapWithKey (\a n -> t a `pow` n) fa'
+  ~(FreeAbelianGroup fa') -> FG $ \t -> Map.foldMapWithKey (\a n -> t a `pow` n) fa'
 {-# inline forgetFA #-}

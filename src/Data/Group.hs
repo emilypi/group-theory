@@ -1,4 +1,3 @@
-{-# language BangPatterns #-}
 {-# language CPP #-}
 {-# language DerivingStrategies #-}
 {-# language FlexibleInstances #-}
@@ -19,7 +18,7 @@
 -- Stability    : stable
 -- Portability  : non-portable
 --
--- This module contains definitions for 'Group' and 'AbelianGroup',
+-- This module contains definitions for 'Group' and 'Abelian',
 -- along with the relevant combinators.
 --
 module Data.Group
@@ -100,7 +99,7 @@ Categorically, 'Group's may be viewed single-object groupoids.
 
 -- | An alias to 'pow'.
 --
--- Similar to 'stimes' from 'Data.Semigroup', but handles
+-- Similar to 'Data.Semigroup.stimes' from 'Data.Semigroup', but handles
 -- negative powers by using 'invert' appropriately.
 --
 -- === __Examples:__

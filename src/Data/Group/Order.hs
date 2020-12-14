@@ -14,16 +14,17 @@
 -- Portability  : non-portable
 --
 -- This module contains definitions for 'GroupOrder'.
-module Data.Group.Order(
-      GroupOrder(..)
-    -- ** Order
-    , Order(..)
-    , pattern Infinitary
-    , pattern Finitary
-    , orderForBits
-    , lcmOrder
-    , FiniteGroup
-    , finiteOrder
+module Data.Group.Order
+( -- * Group order
+  GroupOrder(..)
+  -- ** Order
+, Order(..)
+, pattern Infinitary
+, pattern Finitary
+, orderForBits
+, lcmOrder
+, FiniteGroup
+, finiteOrder
 ) where
 
 import Data.Monoid
@@ -66,34 +67,35 @@ pattern Finitary :: (GroupOrder g) => Natural -> g
 pattern Finitary n <- (order -> Finite n)
 
 -- | @lcmOrder x y@ calculates the least common multiple of two 'Order's.
---   
+--
 --   If both @x@ and @y@ are finite, it returns @'Finite' r@ where @r@
 --   is the least common multiple of them. Otherwise, it returns 'Infinite'.
 --
 -- === __Examples__:
--- 
+--
 -- >>> lcmOrder (Finite 2) (Finite 5)
 -- Finite 10
 -- >>> lcmOrder (Finite 2) (Finite 10)
 -- Finite 10
 -- >>> lcmOrder (Finite 1) Infinite
 -- Infinite
+--
 lcmOrder :: Order -> Order -> Order
 lcmOrder (Finite m) (Finite n) = Finite (lcm m n)
 lcmOrder _          _          = Infinite
 
 -- | The typeclass of groups, equipped with the function
---   computing the order of a specific element of a group.
--- 
+-- computing the order of a specific element of a group.
+--
 -- The order of @x@ is the smallest positive integer @k@
--- such that @'gtimes' k x == 'mempty'@. If there are no such
+-- such that @'Data.Group.gtimes' k x == 'mempty'@. If there are no such
 -- integers, the order of @x@ is defined to be infinity.
---   
+--
 -- /Note:/ For any valid instances of 'GroupOrder',
 -- @order x == Finite 1@ holds if and only if @x == mempty@.
--- 
+--
 -- === __Examples__:
--- 
+--
 -- >>> order (3 :: Sum Word8)
 -- Finite 256
 -- >>> order (16 :: Sum Word8)
@@ -102,12 +104,13 @@ lcmOrder _          _          = Infinite
 -- Finite 1
 -- >>> order (1 :: Sum Integer)
 -- Infinite
+--
 class (Eq g, Group g) => GroupOrder g where
     -- | The order of an element of a group.
-    --   
+    --
     -- @order x@ must be @Finite k@ if the order of @x@ is
     -- finite @k@, and must be @Infinite@ otherwise.
-    --   
+    --
     -- For a type which is also 'FiniteGroup',
     -- @'Finite' . 'finiteOrder'@ is a valid implementation of 'order',
     -- if not efficient.
@@ -139,13 +142,15 @@ instance GroupOrder (Sum Word32) where order = orderForBits
 instance GroupOrder (Sum Word64) where order = orderForBits
 
 -- | Given a number @x :: a@ represented by fixed-width binary integers,
---   return the minimum positive integer @2^n@ such that
---   @(fromInteger (2^n) * x :: a) == 0@.
+-- return the minimum positive integer @2^n@ such that
+-- @(fromInteger (2^n) * x :: a) == 0@.
+--
 zeroFactor :: FiniteBits a => a -> Natural
 zeroFactor a = bit (finiteBitSize a - countTrailingZeros a)
 
 -- | An efficient implementation of 'order' for additive group of
 --   fixed-width integers, like 'Int' or 'Word8'.
+--
 orderForBits :: (Integral a, FiniteBits a) => Sum a -> Order
 orderForBits (Sum a) = Finite (zeroFactor a)
 

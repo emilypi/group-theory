@@ -155,7 +155,7 @@ copower = gtimes
 -- -------------------------------------------------------------------- --
 -- Additive abelian groups
 
--- | An additive abelian group is an 'AbelianGroup' whose operation can be thought of
+-- | An additive abelian group is an 'Abelian' whose operation can be thought of
 -- as commutative addition in some sense. Almost all additive groups are abelian.
 --
 class (G.Abelian g, AdditiveGroup g) => AdditiveAbelianGroup g
