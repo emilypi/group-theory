@@ -53,6 +53,7 @@ library
     Data.Group.Finite
     Data.Group.Foldable
     Data.Group.Free
+    Data.Group.Free.Internal
     Data.Group.Free.Church
     Data.Group.Free.Product
     Data.Group.Multiplicative
