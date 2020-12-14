@@ -5,14 +5,14 @@ let
   inherit (nixpkgs) pkgs;
 
   f = { mkDerivation, base, Cabal, cabal-doctest, containers
-      , doctest, stdenv
+      , doctest, groups, stdenv
       }:
       mkDerivation {
         pname = "group-theory";
-        version = "0.1.0.0";
+        version = "0.2.0.0";
         src = ./.;
         setupHaskellDepends = [ base Cabal cabal-doctest ];
-        libraryHaskellDepends = [ base containers ];
+        libraryHaskellDepends = [ base containers groups ];
         testHaskellDepends = [ base doctest ];
         homepage = "https://github.com/emilypi/group-theory";
         description = "The theory of groups";
