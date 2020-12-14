@@ -27,20 +27,21 @@ module Data.Group.Order
 , finiteOrder
 ) where
 
-import Data.Monoid
-import Data.Proxy (Proxy)
-import Data.Functor.Const ( Const(..) )
-import Data.Functor.Identity ( Identity(..) )
-import Data.Ord (Down(..))
-import Data.Int(Int8, Int16, Int32, Int64)
-import Data.Word(Word8, Word16, Word32, Word64)
 
 import Data.Bits
-    ( Bits(bit), FiniteBits(countTrailingZeros, finiteBitSize) )
+import Data.Functor.Const (Const(..))
+import Data.Functor.Identity (Identity(..))
+import Data.Group
+import Data.Group.Finite (FiniteGroup, finiteOrder)
+import Data.Int
+import Data.Monoid
+import Data.Ord (Down(..))
+import Data.Proxy (Proxy)
+import Data.Word
+
+
 import Numeric.Natural (Natural)
 
-import Data.Group(Group(..))
-import Data.Group.Finite (FiniteGroup, finiteOrder)
 
 -- -------------------------------------------------------------------- --
 -- Group order
@@ -140,6 +141,10 @@ instance GroupOrder (Sum Word8) where order = orderForBits
 instance GroupOrder (Sum Word16) where order = orderForBits
 instance GroupOrder (Sum Word32) where order = orderForBits
 instance GroupOrder (Sum Word64) where order = orderForBits
+
+instance (Eq g, GroupOrder g) => GroupOrder (Abelianizer g) where
+  order Quot = Finite 1
+  order (Commuted g) = order g
 
 -- | Given a number @x :: a@ represented by fixed-width binary integers,
 -- return the minimum positive integer @2^n@ such that
