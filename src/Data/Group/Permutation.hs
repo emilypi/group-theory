@@ -90,14 +90,17 @@ instance Monoid (Permutation a) where
 instance Group (Permutation a) where
   invert (Permutation t f) = Permutation f t
 
-instance (Enum a, Bounded a) => Eq (Permutation a) where
-  (==) = (==) `on` (functionRepr . to)
+equalPermutation
+  :: (Enum a, Bounded a) => Permutation a -> Permutation a -> Bool
+equalPermutation = (==) `on` (functionRepr . to)
 
-instance (Enum a, Bounded a) => Ord (Permutation a) where
-  compare = compare `on` (functionRepr . to)
+comparePermutation
+  :: (Enum a, Bounded a) => Permutation a -> Permutation a -> Ordering
+comparePermutation = compare `on` (functionRepr . to)
 
-instance (Enum a, Bounded a) => GroupOrder (Permutation a) where
-  order Permutation{to = f} = Finite (go 1 fullSet)
+orderOfPermutation
+  :: (Enum a, Bounded a) => Permutation -> Natural
+orderOfPermutation Permutation{to = f} = go 1 fullSet
     where
       n = 1 + fromEnum (maxBound @a)
       fullSet = ISet.fromDistinctAscList [0 .. n - 1]
