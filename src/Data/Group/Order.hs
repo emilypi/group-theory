@@ -142,9 +142,6 @@ instance GroupOrder (Sum Word16) where order = orderForBits
 instance GroupOrder (Sum Word32) where order = orderForBits
 instance GroupOrder (Sum Word64) where order = orderForBits
 
-instance (Eq g, GroupOrder g) => GroupOrder (Abelianizer g) where
-  order Quot = Finite 1
-  order (Commuted g) = order g
 
 -- | Given a number @x :: a@ represented by fixed-width binary integers,
 -- return the minimum positive integer @2^n@ such that
