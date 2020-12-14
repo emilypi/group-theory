@@ -125,7 +125,7 @@ instance Group (FA a) where
   
   > pow (FA g) n = FA $ \k -> gtimes n (g k)
   
-  by dealying the call of 'gtimes' as late as possible.
+  by delaying the call of 'gtimes' as late as possible.
 
   This is only possible because we expect 'Group g' to be an abelian group,
   which implies the following equation hold:

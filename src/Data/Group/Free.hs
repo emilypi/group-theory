@@ -198,7 +198,7 @@ instance (Ord a) => Semigroup (FreeAbelianGroup a) where
           (Map.zipWithMaybeMatched $ \_ m n -> nonZero $ m + n)
         nonZero n = if n == 0 then Nothing else Just n
     
-    stimes = gtimes
+    stimes = flip pow
 
 instance (Ord a) => Monoid (FreeAbelianGroup a) where
     mempty = MkFreeAbelianGroup Map.empty
