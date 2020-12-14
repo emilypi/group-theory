@@ -71,17 +71,10 @@ class Alternative f => Cancellative f where
   cancel :: f a -> f a
   default cancel :: Group (f a) => f a -> f a
   cancel = invert
-  {-# minimal cancel #-}
 
-instance Cancellative FG where
-  cancel = invert
-
-instance Cancellative FA where
-  cancel = invert
-
-instance Cancellative FreeGroup where
-  cancel = invert
-
+instance Cancellative FG
+instance Cancellative FA
+instance Cancellative FreeGroup
 instance Cancellative Proxy where
   cancel _ = Proxy
 
