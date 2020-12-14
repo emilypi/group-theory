@@ -60,7 +60,7 @@ import GHC.Generics
 -- 'GroupFoldable' has difficult-to-define laws in terms of Haskell,
 -- but is well-understood categorically: 'GroupFoldable's are
 -- functors (not necessarily 'Functor's) in the slice category \( [\mathcal{Hask}, \mathcal{Hask}] / F \),
--- where \( F \) is the free group functor in \( \mathcal{Hask} \). Hence, they are
+-- where \( F \) is the free group functor. Hence, they are
 -- defined by the natural transformations \( [\mathcal{Hask},\mathcal{Hask}](-, F) \) - i.e. 'toFG', or 'toFreeGroup'.
 --
 class GroupFoldable t where
