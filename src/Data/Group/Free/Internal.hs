@@ -10,7 +10,8 @@
 -- Stability    : stable
 -- Portability  : non-portable
 --
--- This module exposes internals of a module "Data.Group.Free".
+-- This module exposes internals of 'FreeAbelianGroup'.
+--
 module Data.Group.Free.Internal
 ( -- * Free abelian groups
   FreeAbelianGroup(..)
