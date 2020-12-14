@@ -9,6 +9,7 @@
 * Fixed 'Permutation' instances ([#21](https://github.com/emilypi/group-theory/pull/21))
 * Bugfixes for `FreeAbelianGroup`, allowing it to handle sparsity more robustly, as well as handling
   `mempty` values on construction with a pattern synonym.
+* Typo fixes and documentation updates ([#16](https://github.com/emilypi/group-theory/pull/16), [#17](https://github.com/emilypi/group-theory/pull/17))
 
 ## 0.1.0.0
 
