@@ -10,7 +10,7 @@
 {-# language ViewPatterns #-}
 -- |
 -- Module       : Data.Group
--- Copyright    : (c) 2020 Emily Pillmore
+-- Copyright    : (c) 2020-2021 Emily Pillmore
 -- License      : BSD-style
 --
 -- Maintainer   : Emily Pillmore <emilypi@cohomolo.gy>,
@@ -230,11 +230,11 @@ instance Semigroup g => Semigroup (Abelianizer g) where
   Commuted a <> Commuted b = Commuted (a <> b)
 
 instance Monoid g => Monoid (Abelianizer g) where
-  -- Normally we'd say 'Quot' but these are the same.
-  mempty = Commuted mempty
+  mempty = Quot
 
 instance (Eq g, Group g) => Group (Abelianizer g) where
   invert Quot = Quot
+  invert (Commuted IdentityElem) = Quot
   invert (Commuted a) = Commuted (invert a)
 
 -- | Take the commutator of two elements of a group.

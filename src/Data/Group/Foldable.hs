@@ -6,7 +6,7 @@
 #endif
 -- |
 -- Module       : Data.Group
--- Copyright    : (c) 2020 Reed Mullanix, Emily Pillmore
+-- Copyright    : (c) 2020-2021 Reed Mullanix, Emily Pillmore
 -- License      : BSD-style
 --
 -- Maintainer   : Reed Mullanix <reedmullanix@gmail.com>,

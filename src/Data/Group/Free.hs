@@ -2,7 +2,7 @@
 {-# language Trustworthy #-}
 -- |
 -- Module       : Data.Group.Free
--- Copyright    : (c) 2020 Reed Mullanix, Emily Pillmore
+-- Copyright    : (c) 2020-2021 Reed Mullanix, Emily Pillmore
 -- License      : BSD-style
 --
 -- Maintainer   : Reed Mullanix <reedmullanix@gmail.com>,
@@ -46,7 +46,7 @@ import qualified Data.Map.Strict as Map
 import Data.Group
 import Data.Group.Free.Internal
 import Data.Group.Order
-import Data.Semigroup(Semigroup(..))
+
 
 -- $setup
 --

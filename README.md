@@ -1,7 +1,7 @@
 group-theory
 ==========
 
-[![Hackage](https://img.shields.io/hackage/v/group-theory.svg)](https://hackage.haskell.org/package/group-theory) ![Build Status](https://github.com/emilypi/group-theory/workflows/ci/badge.svg)
+[![Hackage](https://img.shields.io/hackage/v/group-theory.svg)](https://hackage.haskell.org/package/group-theory) ![Build Status](https://github.com/emilypi/group-theory/workflows/Haskell-CI/badge.svg)
 
 This is a package for exploring constructive group theory in Haskell.
 
