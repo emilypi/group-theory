@@ -1,7 +1,7 @@
-cabal-version:   2.0
-name:            group-theory
-version:         0.2.0.0
-synopsis:        The theory of groups
+cabal-version:      2.0
+name:               group-theory
+version:            0.2.0.1
+synopsis:           The theory of groups
 description:
   This package includes definitions for Groups (Monoids with invertibility), including order calculations
   as well as finite, free, cyclic, and permutation groups. Additionally, we add the concept
@@ -17,30 +17,27 @@ description:
   .
   This package, @group-theory@, tries to combine the best parts, while focusing on usability and intuitiveness.
 
-homepage:        https://github.com/emilypi/group-theory
-bug-reports:     https://github.com/emilypi/group-theory/issues
-license:         BSD3
-license-file:    LICENSE
-author:          Emily Pillmore
-maintainer:      Emily Pillmore <emilypi@cohomolo.gy>, Reed Mullanix <reedmullanix@gmail.com>
-copyright:       (c) 2020 Emily Pillmore <emilypi@cohomolo.gy>
-category:        Algebra, Math, Permutations, Groups
-build-type:      Custom
-extra-doc-files:
+homepage:           https://github.com/emilypi/group-theory
+bug-reports:        https://github.com/emilypi/group-theory/issues
+license:            BSD3
+license-file:       LICENSE
+author:             Emily Pillmore
+maintainer:
+  Emily Pillmore <emilypi@cohomolo.gy>, Reed Mullanix <reedmullanix@gmail.com>
+
+copyright:          (c) 2020-2021 Emily Pillmore <emilypi@cohomolo.gy>
+category:           Algebra, Math, Permutations, Groups
+build-type:         Simple
+extra-source-files:
   CHANGELOG.md
   README.md
 
-tested-with:     GHC ==8.4.4 || ==8.6.5 || ==8.8.4 || ==8.10.2
+tested-with:
+  GHC ==8.4.4 || ==8.6.5 || ==8.8.4 || ==8.10.4 || ==9.0.1
 
 source-repository head
   type:     git
   location: https://github.com/emilypi/group-theory.git
-
-custom-setup
-  setup-depends:
-      base           >=4.11 && <5
-    , Cabal
-    , cabal-doctest
 
 library
   exposed-modules:
@@ -51,31 +48,18 @@ library
     Data.Group.Finite
     Data.Group.Foldable
     Data.Group.Free
-    Data.Group.Free.Internal
     Data.Group.Free.Church
+    Data.Group.Free.Internal
     Data.Group.Free.Product
     Data.Group.Multiplicative
     Data.Group.Order
     Data.Group.Permutation
 
   build-depends:
-      base        >=4.11 && <5
-    , containers  >=0.5  && <0.7
+      base        >=4.11  && <5
+    , containers  >=0.5   && <0.7
     , groups      ^>=0.5.2
 
   hs-source-dirs:   src
   default-language: Haskell2010
   ghc-options:      -Wall
-
-test-suite doctests
-  default-language:  Haskell2010
-  type:              exitcode-stdio-1.0
-  main-is:           doctests.hs
-  build-depends:
-      base          >=4.11 && <5
-    , doctest
-    , group-theory
-
-  hs-source-dirs:    test
-  ghc-options:       -Wall -threaded
-  x-doctest-options: --fast

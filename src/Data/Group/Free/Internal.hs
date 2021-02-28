@@ -1,7 +1,7 @@
 {-# language Unsafe #-}
 -- |
 -- Module       : Data.Group.Free.Internal
--- Copyright    : (c) 2020 Reed Mullanix, Emily Pillmore, Koji Miyazato
+-- Copyright    : (c) 2020-2021 Reed Mullanix, Emily Pillmore, Koji Miyazato
 -- License      : BSD-style
 --
 -- Maintainer   : Reed Mullanix <reedmullanix@gmail.com>,

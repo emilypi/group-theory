@@ -4,7 +4,7 @@
 {-# language ViewPatterns #-}
 -- |
 -- Module       : Data.Group.Order
--- Copyright    : (c) 2020 Emily Pillmore
+-- Copyright    : (c) 2020-2021 Emily Pillmore,
 --                Koji Miyazato <viercc@gmail.com>
 -- License      : BSD-style
 --

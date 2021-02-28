@@ -3,7 +3,7 @@
 {-# language Safe #-}
 -- |
 -- Module       : Data.Group.Additive
--- Copyright    : (c) 2020 Emily Pillmore
+-- Copyright    : (c) 2020-2021 Emily Pillmore
 -- License      : BSD-style
 --
 -- Maintainer   : Emily Pillmore <emilypi@cohomolo.gy>,
