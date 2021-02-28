@@ -1,6 +1,6 @@
 cabal-version:      2.0
 name:               group-theory
-version:            0.2.0.1
+version:            0.2.1.0
 synopsis:           The theory of groups
 description:
   This package includes definitions for Groups (Monoids with invertibility), including order calculations
