@@ -1,5 +1,11 @@
 # Revision history for group-theory
 
+## 0.2.1.0
+
+* Support for GHC 9.0
+* Fixed mempty instance for `Abelianizer`
+* Fix warning for redundant semigroup import
+
 ## 0.2.0.0
 
 * Depend on the `groups` package ([#19](https://github.com/emilypi/group-theory/pull/19) - thanks to @taneb for providing the package!)
