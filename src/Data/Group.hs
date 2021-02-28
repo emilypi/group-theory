@@ -230,7 +230,6 @@ instance Semigroup g => Semigroup (Abelianizer g) where
   Commuted a <> Commuted b = Commuted (a <> b)
 
 instance Monoid g => Monoid (Abelianizer g) where
-  -- Normally we'd say 'Quot' but these are the same.
   mempty = Quot
 
 instance (Eq g, Group g) => Group (Abelianizer g) where
