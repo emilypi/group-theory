@@ -26,9 +26,9 @@ module Data.Group.Cyclic
 import "groups" Data.Group as G
 
 -- $setup
---
--- >>> import qualified Prelude
--- >>> import Data.Group
+-- >>> :set -XPackageImports
+-- >>> import Prelude
+-- >>> import "group-theory" Data.Group
 -- >>> import Data.Monoid
 -- >>> import Data.Semigroup
 -- >>> import Data.Word

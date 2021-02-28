@@ -43,9 +43,10 @@ import GHC.Generics
 
 
 -- $setup
---
--- >>> import qualified Prelude
--- >>> import Data.Group
+-- >>> :set -XPackageImports
+-- >>> import Prelude
+-- >>> import "group-theory" Data.Group
+-- >>> import Data.Group.Free
 -- >>> import Data.Monoid
 -- >>> import Data.Semigroup
 -- >>> import Data.Word

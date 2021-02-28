@@ -42,6 +42,15 @@ import Data.Word
 
 import Numeric.Natural (Natural)
 
+-- $setup
+--
+-- >>> :set -XPackageImports
+-- >>> import "group-theory" Data.Group
+-- >>> import Data.Monoid
+-- >>> import Data.Semigroup
+-- >>> import Data.Word
+-- >>> :set -XTypeApplications
+-- >>> :set -XFlexibleContexts
 
 -- -------------------------------------------------------------------- --
 -- Group order

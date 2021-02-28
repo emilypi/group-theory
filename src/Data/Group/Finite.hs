@@ -35,9 +35,9 @@ import Data.Group.Cyclic
 import Numeric.Natural (Natural)
 
 -- $setup
---
--- >>> import qualified Prelude
--- >>> import Data.Group
+-- >>> :set -XPackageImports
+-- >>> import Prelude
+-- >>> import "group-theory" Data.Group
 -- >>> import Data.Monoid
 -- >>> import Data.Semigroup
 -- >>> import Data.Word

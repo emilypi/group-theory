@@ -39,8 +39,10 @@ infixr 8 ^
 
 -- $setup
 --
--- >>> import qualified Prelude
--- >>> import Data.Group
+-- >>> :set -XPackageImports
+-- >>> import Prelude (Int, Rational)
+-- >>> import qualified Prelude as P
+-- >>> import "group-theory" Data.Group
 -- >>> import Data.Monoid
 -- >>> import Data.Semigroup
 -- >>> :set -XTypeApplications

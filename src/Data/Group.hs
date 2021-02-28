@@ -56,8 +56,9 @@ import Prelude hiding (negate, exponent)
 
 -- $setup
 --
+-- >>> :set -XPackageImports
 -- >>> import qualified Prelude
--- >>> import Data.Group
+-- >>> import "group-theory" Data.Group
 -- >>> import Data.Monoid
 -- >>> import Data.Semigroup
 -- >>> import Data.Word

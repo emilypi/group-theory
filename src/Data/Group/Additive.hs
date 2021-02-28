@@ -43,9 +43,10 @@ infixl 6 -, +
 infixl 7 ×
 
 -- $setup
---
+-- >>> :set -XPackageImports
+-- >>> import Prelude (Int)
 -- >>> import qualified Prelude
--- >>> import Data.Group
+-- >>> import "group-theory" Data.Group
 -- >>> import Data.Monoid
 -- >>> import Data.Semigroup
 -- >>> :set -XTypeApplications
