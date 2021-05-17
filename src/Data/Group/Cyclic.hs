@@ -21,6 +21,7 @@ module Data.Group.Cyclic
   -- ** Combinators
 , classify
 , G.generated
+, G.generated'
 ) where
 
 import "groups" Data.Group as G
@@ -55,8 +56,8 @@ easy, we ask for only one generator.
 --
 -- === __Examples__:
 --
--- >>> take 3 $ classify (< (3 :: Sum Word8))
--- [Sum {getSum = 1},Sum {getSum = 2}]
+-- >>> classify @(Sum Word8) (< 3)
+-- [Sum {getSum = 1},Sum {getSum = 2},Sum {getSum = 0}]
 --
 classify :: (Eq a, G.Cyclic a) => (a -> Bool) -> [a]
 classify p = filter p G.generated'
