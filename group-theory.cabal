@@ -1,6 +1,6 @@
 cabal-version:      2.0
 name:               group-theory
-version:            0.2.1.0
+version:            0.2.2
 synopsis:           The theory of groups
 description:
   This package includes definitions for Groups (Monoids with invertibility), including order calculations
@@ -58,7 +58,7 @@ library
   build-depends:
       base        >=4.11  && <5
     , containers  >=0.5   && <0.7
-    , groups      ^>=0.5.2
+    , groups      ^>=0.5.3
 
   hs-source-dirs:   src
   default-language: Haskell2010

@@ -93,8 +93,8 @@ finiteOrder a = go 1 a where
 --
 -- === __Examples__:
 --
--- >>> take 3 $ safeClassify (< (3 :: Sum Word8))
--- [Sum {getSum = 1},Sum {getSum = 2}]
+-- >>> safeClassify @(Sum Word8) (< 3)
+-- [Sum {getSum = 1},Sum {getSum = 2},Sum {getSum = 0}]
 --
 safeClassify :: (Eq a, Cyclic a, FiniteGroup a) => (a -> Bool) -> [a]
 safeClassify = classify

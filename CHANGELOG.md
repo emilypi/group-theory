@@ -1,5 +1,10 @@
 # Revision history for group-theory
 
+## 0.2.2.0
+
+* Bump `groups` bound to `0.5.3` for `generated'` bugfix.
+* Update documentation and doctests
+
 ## 0.2.1.0
 
 * Support for GHC 9.0
